@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .add-form {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .btn-save {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .password-info {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <%- include('../partials/sidebar') %>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Navigation -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="hamburger-menu" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-title">Thêm Khách hàng mới</div>
+                </div>
+                <div class="header-right">
+                    <a href="/admin/customers" class="header-link">
+                        <i class="fas fa-arrow-left"></i>
+                        Quay lại
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1 class="content-title">Thêm Khách hàng mới</h1>
+                    <p class="content-subtitle">Tạo tài khoản khách hàng mới</p>
+                </div>
+                
+                <div class="add-form">
+                    <div id="alert" class="alert"></div>
+                    
+                    <form id="addCustomerForm">
+                        <div class="form-group">
+                            <label class="form-label">Họ tên *</label>
+                            <input type="text" class="form-input" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-input" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-input" name="phone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Mật khẩu *</label>
+                            <input type="password" class="form-input" name="password" required minlength="6">
+                            <div class="password-info">
+                                <i class="fas fa-info-circle"></i>
+                                Mật khẩu phải có ít nhất 6 ký tự
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Địa chỉ</label>
+                            <textarea class="form-textarea" name="address" placeholder="Nhập địa chỉ..."></textarea>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-save">
+                                <i class="fas fa-plus"></i>
+                                Thêm khách hàng
+                            </button>
+                            <a href="/admin/customers" class="btn btn-cancel">
+                                <i class="fas fa-times"></i>
+                                Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            sidebar.classList.toggle('open');
+        }
+        
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+        
+        document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Kiểm tra mật khẩu
+            if (data.password.length < 6) {
+                showAlert('Mật khẩu phải có ít nhất 6 ký tự', 'error');
+                return;
+            }
+            
+            fetch('/admin/customers/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/admin/customers';
+                    }, 1500);
+                } else {
+                    showAlert(result.message, 'error');
+                }
+            })
+            .catch(error => {
+                showAlert('Có lỗi xảy ra khi thêm khách hàng', 'error');
+            });
+        });
+    </script>
+</body>
+</html>
+
+

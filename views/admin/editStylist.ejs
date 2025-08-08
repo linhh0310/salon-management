@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa Stylist - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-container { padding: 100px 20px 40px; background: #f8f9fa; min-height: 100vh; }
+        
+        .admin-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #1e3a8a;
+            color: white;
+            padding: 20px;
+        }
+        
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            display: block;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            color: #1e3a8a;
+            margin: 0;
+        }
+        
+        .btn-back {
+            background: #6b7280;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .content-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-submit {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-submit:hover {
+            background: #2563eb;
+        }
+        
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .flash-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .flash-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                                <div class="logo">
+                    <h1>LYN Salon</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="/admin/dashboard">Dashboard</a></li>
+                        <li><a href="/admin/users">Quản lý Users</a></li>
+                        <li><a href="/admin/services">Quản lý Services</a></li>
+                        <li><a href="/admin/stylists" class="active">Quản lý Stylists</a></li>
+                        <li><a href="/admin/appointments">Quản lý Appointments</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <span>Xin chào, Admin <%= user.name %></span>
+                    <a href="/logout" class="btn btn-outline">Đăng xuất</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="admin-container">
+        <div class="admin-content">
+            
+            </div>
+
+            <% if (errors && errors.length > 0) { %>
+                <div class="flash-message flash-error">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <% errors.forEach(function(error) { %>
+                            <li><%= error.msg %></li>
+                        <% }); %>
+                    </ul>
+                </div>
+            <% } %>
+
+            <div class="content-section">
+                <form method="POST" action="/admin/stylists/<%= stylist.id %>/edit">
+                    <div class="form-group">
+                        <label for="name">Tên stylist *</label>
+                        <input type="text" id="name" name="name" value="<%= stylist.name %>" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại *</label>
+                            <input type="tel" id="phone" name="phone" value="<%= stylist.phone %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" value="<%= stylist.email || '' %>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialties">Chuyên môn</label>
+                        <textarea id="specialties" name="specialties" rows="3" placeholder="VD: Cắt tóc nam, Gội đầu, Uốn nhuộm"><%= stylist.specialties || '' %></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="experience">Kinh nghiệm (năm) *</label>
+                            <input type="number" id="experience" name="experience" value="<%= stylist.experience %>" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="status">Trạng thái</label>
+                            <select id="status" name="status">
+                                <option value="active" <%= stylist.status === 'active' ? 'selected' : '' %>>Đang hoạt động</option>
+                                <option value="inactive" <%= stylist.status === 'inactive' ? 'selected' : '' %>>Tạm nghỉ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Cập nhật stylist
+                        </button>
+                    </div>
+                </form>
+            </div>
+                </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Dịch vụ - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 0 20px 10px;
+            color: #bdc3c7;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item.active {
+            background: #34495e;
+            border-left-color: #3498db;
+            color: #3498db;
+        }
+
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item-arrow {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            background: #f4f6f8;
+        }
+
+        /* Top Navigation */
+        .admin-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .hamburger-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .header-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 30px;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .content-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .content-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #059669;
+        }
+
+        /* Data Table */
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8fafc;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: #f8fafc;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .price {
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        /* Footer */
+        .admin-footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name">Admin</div>
+                <div class="profile-status">
+                    <i class="fas fa-circle"></i>
+                    Online
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">MENU ADMIN</div>
+                    <a href="/admin" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-home"></i>
+                            <span>Trang chủ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/appointments" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Lịch hẹn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/services" class="menu-item active">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cut"></i>
+                            <span>Dịch vụ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/stylists" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Stylist</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/products" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Quản lý sản phẩm</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/orders" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Đơn hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/reviews" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-star"></i>
+                            <span>Đánh giá</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/customers" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-users"></i>
+                            <span>Khách hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/contact" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-envelope"></i>
+                            <span>Tin nhắn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/employees" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Nhân viên</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/settings" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Navigation -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="hamburger-menu" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-title">Quản lý Dịch vụ</div>
+                </div>
+                <div class="header-right">
+                    <a href="/" class="header-link">
+                        <i class="fas fa-eye"></i>
+                        Xem website
+                    </a>
+                    <div class="admin-user">
+                        <i class="fas fa-user"></i>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1 class="content-title">Quản lý Dịch vụ</h1>
+                    <p class="content-subtitle">Thêm, sửa và quản lý các dịch vụ salon</p>
+                </div>
+                
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <div></div>
+                    <a href="/admin/services/add" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                        Thêm dịch vụ mới
+                    </a>
+                </div>
+                
+                <!-- Data Table -->
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">Danh sách dịch vụ</h3>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên dịch vụ</th>
+                                <th>Danh mục</th>
+                                <th>Mô tả</th>
+                                <th>Giá</th>
+                                <th>Thời gian</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% services.forEach(function(service) { %>
+                            <tr>
+                                <td><%= service.id %></td>
+                                <td><%= service.name %></td>
+                                <td><%= service.category || 'Chưa phân loại' %></td>
+                                <td><%= service.description || 'Không có mô tả' %></td>
+                                <td class="price"><%= service.price.toLocaleString('vi-VN') %> ₫</td>
+                                <td><%= service.duration %> phút</td>
+                                <td>
+                                    <a href="/admin/services/<%= service.id %>/edit" class="btn-action btn-edit">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <button class="btn-action btn-delete" onclick="deleteService(<%= service.id %>)">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="admin-footer">
+                <div>Copyright © 2014-2015 SÀI GÒN WEB</div>
+                <div>Version 1.0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Delete service
+        function deleteService(id) {
+            if (confirm('Bạn có chắc muốn xóa dịch vụ này?')) {
+                fetch(`/admin/services/${id}/delete`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Có lỗi xảy ra!');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html> 

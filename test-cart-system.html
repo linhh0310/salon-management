@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cart System - LYN Salon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .cart-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .user-info {
+            background: #e2e3e5;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Hệ Thống Giỏ Hàng - LYN Salon</h1>
+        
+        <div class="info">
+            <strong>Hướng dẫn:</strong> Sử dụng các nút bên dưới để test các tính năng của hệ thống giỏ hàng.
+        </div>
+
+        <!-- Test User Management -->
+        <div class="test-section">
+            <h3>👤 Quản Lý User</h3>
+            <button class="btn" onclick="simulateLogin('user1')">Đăng nhập User 1</button>
+            <button class="btn" onclick="simulateLogin('user2')">Đăng nhập User 2</button>
+            <button class="btn btn-danger" onclick="simulateLogout()">Đăng xuất</button>
+            <button class="btn" onclick="clearAllData()">Xóa tất cả dữ liệu</button>
+            
+            <div id="currentUser" class="user-info">
+                <strong>User hiện tại:</strong> Chưa đăng nhập
+            </div>
+        </div>
+
+        <!-- Test Cart Operations -->
+        <div class="test-section">
+            <h3>🛒 Thao Tác Giỏ Hàng</h3>
+            <button class="btn btn-success" onclick="addProduct(1, 'Sản phẩm 1', 100000, '/images/product1.jpg')">Thêm Sản phẩm 1</button>
+            <button class="btn btn-success" onclick="addProduct(2, 'Sản phẩm 2', 200000, '/images/product2.jpg')">Thêm Sản phẩm 2</button>
+            <button class="btn btn-success" onclick="addProduct(3, 'Sản phẩm 3', 150000, '/images/product3.jpg')">Thêm Sản phẩm 3</button>
+            <button class="btn" onclick="updateQuantity(1, 1)">Tăng SL Sản phẩm 1</button>
+            <button class="btn" onclick="updateQuantity(1, -1)">Giảm SL Sản phẩm 1</button>
+            <button class="btn btn-danger" onclick="removeProduct(1)">Xóa Sản phẩm 1</button>
+            <button class="btn btn-danger" onclick="clearCart()">Xóa toàn bộ giỏ hàng</button>
+        </div>
+
+        <!-- Display Current State -->
+        <div class="test-section">
+            <h3>📊 Trạng Thái Hiện Tại</h3>
+            <button class="btn" onclick="displayCurrentState()">Cập nhật trạng thái</button>
+            
+            <div id="stateDisplay" class="cart-display">
+                Nhấn "Cập nhật trạng thái" để xem thông tin
+            </div>
+        </div>
+
+        <!-- Test Scenarios -->
+        <div class="test-section">
+            <h3>🎭 Test Kịch Bản</h3>
+            <button class="btn" onclick="testScenario1()">Kịch bản 1: Đăng nhập → Thêm sản phẩm → Đăng xuất → Đăng nhập lại</button>
+            <button class="btn" onclick="testScenario2()">Kịch bản 2: Chuyển đổi giỏ hàng giữa 2 user</button>
+            <button class="btn" onclick="testScenario3()">Kịch bản 3: Test CartManager class</button>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="test-section">
+            <h3>🔍 Debug Information</h3>
+            <button class="btn" onclick="showDebugInfo()">Hiển thị thông tin debug</button>
+            <div id="debugInfo" class="cart-display"></div>
+        </div>
+    </div>
+
+    <script src="/js/cart-manager.js"></script>
+    <script>
+        // Test functions
+        function simulateLogin(userId) {
+            const userData = {
+                id: userId === 'user1' ? 1 : 2,
+                name: userId === 'user1' ? 'Nguyễn Văn A' : 'Trần Thị B',
+                email: userId === 'user1' ? 'user1@example.com' : 'user2@example.com',
+                role: 'customer'
+            };
+
+            if (window.cartManager) {
+                window.cartManager.handleLoginSuccess(userData);
+            } else {
+                // Fallback nếu CartManager chưa load
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+            }
+
+            updateUserDisplay();
+            showMessage(`Đã đăng nhập: ${userData.name}`, 'success');
+        }
+
+        function simulateLogout() {
+            if (window.cartManager) {
+                window.cartManager.handleLogout();
+            } else {
+                // Fallback
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('cart');
+            }
+
+            updateUserDisplay();
+            showMessage('Đã đăng xuất', 'info');
+        }
+
+        function addProduct(id, name, price, image) {
+            if (window.cartManager) {
+                window.cartManager.addToCart(id, name, price, image);
+                showMessage(`Đã thêm ${name} vào giỏ hàng`, 'success');
+            } else {
+                // Fallback
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const existingItem = cart.find(item => item.id === id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({ id, name, price, image, quantity: 1 });
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                showMessage(`Đã thêm ${name} vào giỏ hàng`, 'success');
+            }
+        }
+
+        function updateQuantity(productId, change) {
+            if (window.cartManager) {
+                window.cartManager.updateQuantity(productId, change);
+                showMessage(`Đã cập nhật số lượng sản phẩm ${productId}`, 'info');
+            }
+        }
+
+        function removeProduct(productId) {
+            if (window.cartManager) {
+                window.cartManager.removeFromCart(productId);
+                showMessage(`Đã xóa sản phẩm ${productId}`, 'warning');
+            }
+        }
+
+        function clearCart() {
+            if (window.cartManager) {
+                window.cartManager.clearCart();
+                showMessage('Đã xóa toàn bộ giỏ hàng', 'warning');
+            }
+        }
+
+        function clearAllData() {
+            localStorage.clear();
+            showMessage('Đã xóa tất cả dữ liệu', 'warning');
+            updateUserDisplay();
+        }
+
+        function displayCurrentState() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const allUserCarts = {};
+            
+            // Lấy tất cả giỏ hàng của user
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('userCart_')) {
+                    const userId = key.replace('userCart_', '');
+                    allUserCarts[userId] = JSON.parse(localStorage.getItem(key) || '[]');
+                }
+            }
+
+            const state = {
+                currentUser: currentUser,
+                currentCart: cart,
+                allUserCarts: allUserCarts,
+                localStorageKeys: Object.keys(localStorage)
+            };
+
+            document.getElementById('stateDisplay').textContent = JSON.stringify(state, null, 2);
+        }
+
+        function updateUserDisplay() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const userDisplay = document.getElementById('currentUser');
+            
+            if (currentUser.id) {
+                userDisplay.innerHTML = `<strong>User hiện tại:</strong> ${currentUser.name} (ID: ${currentUser.id})`;
+            } else {
+                userDisplay.innerHTML = '<strong>User hiện tại:</strong> Chưa đăng nhập';
+            }
+        }
+
+        function showDebugInfo() {
+            const debugInfo = {
+                cartManagerExists: !!window.cartManager,
+                localStorageSize: localStorage.length,
+                currentUser: JSON.parse(localStorage.getItem('currentUser') || '{}'),
+                cartItems: JSON.parse(localStorage.getItem('cart') || '[]').length,
+                allKeys: Object.keys(localStorage)
+            };
+
+            document.getElementById('debugInfo').textContent = JSON.stringify(debugInfo, null, 2);
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = 
+                'position: fixed;' +
+                'top: 20px;' +
+                'right: 20px;' +
+                'padding: 15px 20px;' +
+                'border-radius: 8px;' +
+                'color: white;' +
+                'font-weight: 500;' +
+                'z-index: 3000;' +
+                'animation: slideIn 0.3s ease-out;';
+            
+            if (type === 'success') {
+                messageDiv.style.backgroundColor = '#28a745';
+            } else if (type === 'warning') {
+                messageDiv.style.backgroundColor = '#ffc107';
+                messageDiv.style.color = '#000';
+            } else if (type === 'error') {
+                messageDiv.style.backgroundColor = '#dc3545';
+            } else {
+                messageDiv.style.backgroundColor = '#17a2b8';
+            }
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // Test scenarios
+        function testScenario1() {
+            showMessage('Bắt đầu test kịch bản 1...', 'info');
+            
+            // Step 1: Đăng nhập user1
+            setTimeout(() => {
+                simulateLogin('user1');
+                showMessage('Bước 1: Đăng nhập User 1', 'info');
+            }, 1000);
+
+            // Step 2: Thêm sản phẩm
+            setTimeout(() => {
+                addProduct(1, 'Sản phẩm test', 100000, '/images/test.jpg');
+                showMessage('Bước 2: Thêm sản phẩm', 'info');
+            }, 2000);
+
+            // Step 3: Đăng xuất
+            setTimeout(() => {
+                simulateLogout();
+                showMessage('Bước 3: Đăng xuất', 'info');
+            }, 3000);
+
+            // Step 4: Đăng nhập lại
+            setTimeout(() => {
+                simulateLogin('user1');
+                showMessage('Bước 4: Đăng nhập lại - Kiểm tra giỏ hàng', 'success');
+            }, 4000);
+        }
+
+        function testScenario2() {
+            showMessage('Bắt đầu test kịch bản 2...', 'info');
+            
+            // Step 1: Đăng nhập user1 và thêm sản phẩm
+            setTimeout(() => {
+                simulateLogin('user1');
+                addProduct(1, 'Sản phẩm của User 1', 100000, '/images/user1.jpg');
+                showMessage('Bước 1: User 1 thêm sản phẩm', 'info');
+            }, 1000);
+
+            // Step 2: Đăng xuất
+            setTimeout(() => {
+                simulateLogout();
+                showMessage('Bước 2: Đăng xuất', 'info');
+            }, 2000);
+
+            // Step 3: Đăng nhập user2
+            setTimeout(() => {
+                simulateLogin('user2');
+                addProduct(2, 'Sản phẩm của User 2', 200000, '/images/user2.jpg');
+                showMessage('Bước 3: User 2 thêm sản phẩm', 'info');
+            }, 3000);
+
+            // Step 4: Đăng xuất và đăng nhập lại user1
+            setTimeout(() => {
+                simulateLogout();
+                setTimeout(() => {
+                    simulateLogin('user1');
+                    showMessage('Bước 4: Kiểm tra giỏ hàng User 1', 'success');
+                }, 500);
+            }, 4000);
+        }
+
+        function testScenario3() {
+            showMessage('Test CartManager class...', 'info');
+            
+            if (window.cartManager) {
+                const cart = window.cartManager.getCart();
+                showMessage(`CartManager hoạt động tốt. Giỏ hàng có ${cart.length} sản phẩm`, 'success');
+            } else {
+                showMessage('CartManager chưa được load', 'error');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserDisplay();
+            showMessage('Test page đã sẵn sàng!', 'success');
+        });
+
+        // Add slideIn animation
+        const style = document.createElement('style');
+        style.textContent = 
+            '@keyframes slideIn {' +
+            '    from {' +
+            '        opacity: 0;' +
+            '        transform: translateX(100%);' +
+            '    }' +
+            '    to {' +
+            '        opacity: 1;' +
+            '        transform: translateX(0);' +
+            '    }' +
+            '}';
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+
+

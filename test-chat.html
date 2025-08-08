@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chat System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .chat-widget-button {
+            width: 60px;
+            height: 60px;
+            background: #007bff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Chat System</h1>
+        
+        <div class="test-section">
+            <h3>1. Kiểm tra Database</h3>
+            <button class="btn" onclick="testDatabase()">Test Database Connection</button>
+            <div id="dbResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test Chat API</h3>
+            <button class="btn" onclick="testChatAPI()">Test Chat API</button>
+            <div id="apiResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Test Chat Widget</h3>
+            <button class="btn" onclick="testChatWidget()">Test Chat Widget</button>
+            <div id="widgetResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Test Send Message</h3>
+            <input type="text" id="testMessage" placeholder="Nhập tin nhắn test..." style="padding: 8px; margin-right: 10px; width: 200px;">
+            <button class="btn" onclick="testSendMessage()">Gửi tin nhắn test</button>
+            <div id="sendResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Test Get Messages</h3>
+            <button class="btn" onclick="testGetMessages()">Lấy tin nhắn</button>
+            <div id="getResult"></div>
+        </div>
+    </div>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-widget-button" onclick="toggleChatWidget()">
+            <i class="fas fa-comments"></i>
+        </div>
+    </div>
+
+    <script>
+        // Test Database
+        async function testDatabase() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.innerHTML = '<div class="result">Đang kiểm tra...</div>';
+            
+            try {
+                const response = await fetch('/chat/chats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = '<div class="result success">✅ Database hoạt động bình thường!</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">❌ Lỗi database: ' + data.message + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="result error">❌ Lỗi kết nối: ' + error.message + '</div>';
+            }
+        }
+
+        // Test Chat API
+        async function testChatAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<div class="result">Đang test API...</div>';
+            
+            try {
+                const response = await fetch('/chat/messages/1/admin');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = '<div class="result success">✅ Chat API hoạt động! Có ' + data.messages.length + ' tin nhắn</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">❌ Lỗi API: ' + data.message + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="result error">❌ Lỗi API: ' + error.message + '</div>';
+            }
+        }
+
+        // Test Chat Widget
+        function testChatWidget() {
+            const resultDiv = document.getElementById('widgetResult');
+            
+            if (typeof window.chatWidget !== 'undefined') {
+                resultDiv.innerHTML = '<div class="result success">✅ Chat Widget đã được load!</div>';
+            } else {
+                resultDiv.innerHTML = '<div class="result error">❌ Chat Widget chưa được load</div>';
+            }
+        }
+
+        // Test Send Message
+        async function testSendMessage() {
+            const message = document.getElementById('testMessage').value;
+            const resultDiv = document.getElementById('sendResult');
+            
+            if (!message) {
+                resultDiv.innerHTML = '<div class="result error">❌ Vui lòng nhập tin nhắn</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="result">Đang gửi tin nhắn...</div>';
+            
+            try {
+                const response = await fetch('/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        receiver_id: 1,
+                        receiver_type: 'admin',
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = '<div class="result success">✅ Tin nhắn đã được gửi! ID: ' + data.messageId + '</div>';
+                    document.getElementById('testMessage').value = '';
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">❌ Lỗi gửi tin nhắn: ' + data.message + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="result error">❌ Lỗi: ' + error.message + '</div>';
+            }
+        }
+
+        // Test Get Messages
+        async function testGetMessages() {
+            const resultDiv = document.getElementById('getResult');
+            resultDiv.innerHTML = '<div class="result">Đang lấy tin nhắn...</div>';
+            
+            try {
+                const response = await fetch('/chat/messages/1/admin');
+                const data = await response.json();
+                
+                if (data.success) {
+                    let messagesHtml = '<div class="result success">✅ Lấy tin nhắn thành công! (' + data.messages.length + ' tin nhắn)</div>';
+                    messagesHtml += '<div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">';
+                    
+                    data.messages.forEach(msg => {
+                        messagesHtml += '<div style="padding: 5px; border-bottom: 1px solid #eee;">';
+                        messagesHtml += '<strong>' + msg.sender_type + ':</strong> ' + msg.message;
+                        messagesHtml += '<br><small>' + new Date(msg.created_at).toLocaleString() + '</small>';
+                        messagesHtml += '</div>';
+                    });
+                    
+                    messagesHtml += '</div>';
+                    resultDiv.innerHTML = messagesHtml;
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">❌ Lỗi lấy tin nhắn: ' + data.message + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="result error">❌ Lỗi: ' + error.message + '</div>';
+            }
+        }
+
+        // Toggle Chat Widget
+        function toggleChatWidget() {
+            alert('Chat Widget được click! Hãy kiểm tra console để xem chi tiết.');
+            console.log('Chat Widget clicked');
+        }
+
+        // Auto test khi trang load
+        window.addEventListener('load', function() {
+            console.log('🧪 Chat Test Page loaded');
+            setTimeout(() => {
+                testChatWidget();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

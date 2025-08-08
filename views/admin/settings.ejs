@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài đặt Hệ thống - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 0 20px 10px;
+            color: #bdc3c7;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item.active {
+            background: #34495e;
+            border-left-color: #3498db;
+            color: #3498db;
+        }
+
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item-arrow {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            background: #f4f6f8;
+        }
+
+        /* Top Navigation */
+        .admin-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .hamburger-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .header-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 30px;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .content-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .content-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #f8fafc;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-save {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #059669;
+        }
+
+        .btn-reset {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #4b5563;
+        }
+
+        .settings-info {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .settings-info h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .settings-info p {
+            color: #1e40af;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .admin-footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name">Admin</div>
+                <div class="profile-status">
+                    <i class="fas fa-circle"></i>
+                    Online
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">MENU ADMIN</div>
+                    <a href="/admin" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-home"></i>
+                            <span>Trang chủ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/appointments" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Lịch hẹn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/services" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cut"></i>
+                            <span>Dịch vụ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/stylists" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Stylist</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/products" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Quản lý sản phẩm</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/orders" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Đơn hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/reviews" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-star"></i>
+                            <span>Đánh giá</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/customers" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-users"></i>
+                            <span>Khách hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/contact" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-envelope"></i>
+                            <span>Tin nhắn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/employees" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Nhân viên</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/settings" class="menu-item active">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Navigation -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="hamburger-menu" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-title">Cài đặt Hệ thống</div>
+                </div>
+                <div class="header-right">
+                    <a href="/" class="header-link">
+                        <i class="fas fa-eye"></i>
+                        Xem website
+                    </a>
+                    <div class="admin-user">
+                        <i class="fas fa-user"></i>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1 class="content-title">Cài đặt Hệ thống</h1>
+                    <p class="content-subtitle">Quản lý cấu hình và thiết lập hệ thống</p>
+                </div>
+                
+                <!-- Settings Info -->
+                <div class="settings-info">
+                    <h4><i class="fas fa-info-circle"></i> Thông tin cài đặt</h4>
+                    <p>Các thay đổi trong cài đặt sẽ được áp dụng ngay lập tức. Hãy đảm bảo kiểm tra kỹ trước khi lưu.</p>
+                </div>
+                
+                <!-- Settings Grid -->
+                <div class="settings-grid">
+                    <!-- General Settings -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-cog"></i>
+                                Cài đặt chung
+                            </h3>
+                        </div>
+                        <div class="card-content">
+                            <form id="generalSettings">
+                                <div class="form-group">
+                                    <label class="form-label">Tên salon</label>
+                                    <input type="text" class="form-input" name="salon_name" value="LYN Salon" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email liên hệ</label>
+                                    <input type="email" class="form-input" name="contact_email" value="info@lynsalon.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input type="tel" class="form-input" name="contact_phone" value="0123456789">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Địa chỉ</label>
+                                    <textarea class="form-textarea" name="address" rows="3">123 Đường ABC, Quận 1, TP.HCM</textarea>
+                                </div>
+                                <button type="submit" class="btn-save">Lưu cài đặt</button>
+                                <button type="reset" class="btn-reset">Đặt lại</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Email Settings -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-envelope"></i>
+                                Cài đặt Email
+                            </h3>
+                        </div>
+                        <div class="card-content">
+                            <form id="emailSettings">
+                                <div class="form-group">
+                                    <label class="form-label">SMTP Host</label>
+                                    <input type="text" class="form-input" name="smtp_host" value="smtp.gmail.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">SMTP Port</label>
+                                    <input type="number" class="form-input" name="smtp_port" value="587">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email gửi</label>
+                                    <input type="email" class="form-input" name="smtp_email" value="noreply@lynsalon.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Mật khẩu</label>
+                                    <input type="password" class="form-input" name="smtp_password" value="">
+                                </div>
+                                <button type="submit" class="btn-save">Lưu cài đặt</button>
+                                <button type="reset" class="btn-reset">Đặt lại</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Notification Settings -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-bell"></i>
+                                Cài đặt thông báo
+                            </h3>
+                        </div>
+                        <div class="card-content">
+                            <form id="notificationSettings">
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="email_notifications" name="email_notifications" checked>
+                                    <label for="email_notifications">Thông báo qua email</label>
+                                </div>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="sms_notifications" name="sms_notifications">
+                                    <label for="sms_notifications">Thông báo qua SMS</label>
+                                </div>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="appointment_reminders" name="appointment_reminders" checked>
+                                    <label for="appointment_reminders">Nhắc nhở lịch hẹn</label>
+                                </div>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="new_order_notifications" name="new_order_notifications" checked>
+                                    <label for="new_order_notifications">Thông báo đơn hàng mới</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Thời gian nhắc nhở (phút)</label>
+                                    <input type="number" class="form-input" name="reminder_time" value="30" min="15" max="1440">
+                                </div>
+                                <button type="submit" class="btn-save">Lưu cài đặt</button>
+                                <button type="reset" class="btn-reset">Đặt lại</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- System Settings -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-server"></i>
+                                Cài đặt hệ thống
+                            </h3>
+                        </div>
+                        <div class="card-content">
+                            <form id="systemSettings">
+                                <div class="form-group">
+                                    <label class="form-label">Múi giờ</label>
+                                    <select class="form-select" name="timezone">
+                                        <option value="Asia/Ho_Chi_Minh" selected>Asia/Ho_Chi_Minh (GMT+7)</option>
+                                        <option value="UTC">UTC (GMT+0)</option>
+                                        <option value="America/New_York">America/New_York (GMT-5)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Ngôn ngữ</label>
+                                    <select class="form-select" name="language">
+                                        <option value="vi" selected>Tiếng Việt</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Số bản ghi mỗi trang</label>
+                                    <input type="number" class="form-input" name="records_per_page" value="20" min="10" max="100">
+                                </div>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="maintenance_mode" name="maintenance_mode">
+                                    <label for="maintenance_mode">Chế độ bảo trì</label>
+                                </div>
+                                <button type="submit" class="btn-save">Lưu cài đặt</button>
+                                <button type="reset" class="btn-reset">Đặt lại</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="admin-footer">
+                <div>Copyright © 2014-2015 SÀI GÒN WEB</div>
+                <div>Version 1.0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Handle form submissions
+        document.getElementById('generalSettings').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveSettings('general', this);
+        });
+
+        document.getElementById('emailSettings').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveSettings('email', this);
+        });
+
+        document.getElementById('notificationSettings').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveSettings('notification', this);
+        });
+
+        document.getElementById('systemSettings').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveSettings('system', this);
+        });
+
+        function saveSettings(type, form) {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            fetch(`/admin/settings/${type}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Cài đặt đã được lưu thành công!');
+                } else {
+                    alert('Có lỗi xảy ra khi lưu cài đặt!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi lưu cài đặt!');
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dịch vụ - Lyn Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .services-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .services-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .services-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .service-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8f9fa;
+        }
+        
+        .service-info {
+            padding: 20px;
+        }
+        
+        .service-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .service-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+        
+        .service-duration {
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .service-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .service-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-book-service {
+            flex: 1;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .btn-book-service:hover {
+            background: #0056b3;
+        }
+        
+        .no-services {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        .service-category {
+            margin-bottom: 50px;
+        }
+        
+        .category-title {
+            color: #007bff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #007bff;
+            position: relative;
+        }
+        
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #007bff;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+            
+            .services-header h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <div class="services-container">
+        <div class="services-header">
+            <h1>Dịch vụ của chúng tôi</h1>
+            <p>Khám phá các dịch vụ chăm sóc tóc và thư giãn chuyên nghiệp tại LYN Salon</p>
+        </div>
+        
+        <% if (services && services.length > 0) { %>
+            <!-- DỊCH VỤ TÓC -->
+            <div class="service-category">
+                <h2 class="category-title">DỊCH VỤ TÓC</h2>
+                <div class="services-grid">
+                    <% services.filter(service => 
+                        service.name.toLowerCase().includes('cắt tóc') || 
+                        service.name.toLowerCase().includes('thay đổi màu') || 
+                        service.name.toLowerCase().includes('uốn') ||
+                        service.name.toLowerCase().includes('nhuộm') ||
+                        service.name.toLowerCase().includes('duỗi')
+                    ).forEach(function(service) { %>
+                        <div class="service-card">
+                            <img src="<%= service.image_url || '/images/service1.jpg' %>" alt="<%= service.name %>" class="service-image" onerror="this.src='/images/service1.jpg'">
+                            <div class="service-info">
+                                <h3 class="service-name"><%= service.name %></h3>
+                                <div class="service-price">
+                                    <%= service.price.toLocaleString('vi-VN') %> VNĐ
+                                </div>
+                                <div class="service-duration">
+                                    Thời gian: <%= service.duration %> phút
+                                </div>
+                                <p class="service-description">
+                                    <%= service.description %>
+                                </p>
+                                <div class="service-actions">
+                                    <a href="/book-appointment?service=<%= service.id %>" class="btn-book-service">Đặt lịch</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+
+            <!-- THƯ GIÃN VÀ CHĂM SÓC DA -->
+            <div class="service-category">
+                <h2 class="category-title">THƯ GIÃN VÀ CHĂM SÓC DA</h2>
+                <div class="services-grid">
+                    <% services.filter(service => 
+                        service.name.toLowerCase().includes('gội dưỡng') || 
+                        service.name.toLowerCase().includes('lấy ráy') ||
+                        service.name.toLowerCase().includes('massage') ||
+                        service.name.toLowerCase().includes('chăm sóc da') ||
+                        service.name.toLowerCase().includes('thư giãn')
+                    ).forEach(function(service) { %>
+                        <div class="service-card">
+                            <img src="<%= service.image_url || '/images/service1.jpg' %>" alt="<%= service.name %>" class="service-image" onerror="this.src='/images/service1.jpg'">
+                            <div class="service-info">
+                                <h3 class="service-name"><%= service.name %></h3>
+                                <div class="service-price">
+                                    <%= service.price.toLocaleString('vi-VN') %> VNĐ
+                                </div>
+                                <div class="service-duration">
+                                    Thời gian: <%= service.duration %> phút
+                                </div>
+                                <p class="service-description">
+                                    <%= service.description %>
+                                </p>
+                                <div class="service-actions">
+                                    <a href="/book-appointment?service=<%= service.id %>" class="btn-book-service">Đặt lịch</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="no-services">
+                <h3>Không có dịch vụ nào</h3>
+                <p>Vui lòng liên hệ với chúng tôi để biết thêm thông tin.</p>
+            </div>
+        <% } %>
+    </div>
+    
+    <%- include('partials/footer') %>
+</body>
+</html> 

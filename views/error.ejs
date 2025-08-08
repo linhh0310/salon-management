@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lỗi - 30 SHINE</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 20px;
+        }
+        
+        .error-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .error-icon {
+            font-size: 80px;
+            color: #dc2626;
+            margin-bottom: 20px;
+        }
+        
+        .error-title {
+            font-size: 32px;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+        
+        .error-message {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .error-code {
+            background: #f3f4f6;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-bottom: 30px;
+            color: #374151;
+        }
+        
+        .back-btn {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-card">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <h1 class="error-title">
+                <% if (error && error.status) { %>
+                    Lỗi <%= error.status %>
+                <% } else { %>
+                    Có lỗi xảy ra
+                <% } %>
+            </h1>
+            
+            <p class="error-message">
+                <%= message || 'Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau.' %>
+            </p>
+            
+            <% if (error && error.stack && process.env.NODE_ENV === 'development') { %>
+                <div class="error-code">
+                    <pre><%= error.stack %></pre>
+                </div>
+            <% } %>
+            
+            <a href="/" class="back-btn">
+                <i class="fas fa-home"></i> Về trang chủ
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

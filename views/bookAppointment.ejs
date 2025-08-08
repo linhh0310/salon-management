@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt lịch hẹn - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .booking-container {
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 50%, #e6f3ff 100%);
+            min-height: 100vh;
+        }
+        
+        .booking-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .booking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #0066cc, #0099ff);
+        }
+        
+        .booking-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .booking-header h1 {
+            color: #0066cc;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .booking-header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .booking-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .step.active {
+            background: #0066cc;
+            color: white;
+        }
+        
+        .step-number {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .step.active .step-number {
+            background: white;
+            color: #0066cc;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0066cc;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #374151;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .service-info {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f3ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border-left: 4px solid #0066cc;
+        }
+        
+        .service-price {
+            font-weight: bold;
+            color: #0066cc;
+            font-size: 1.2rem;
+        }
+        
+        .booking-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #0066cc 0%, #0099ff 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .booking-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 102, 204, 0.3);
+        }
+        
+        .booking-btn:active {
+            transform: translateY(0);
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .back-link a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        
+        .back-link a:hover {
+            background: #f3f4f6;
+        }
+        
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .time-slot {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .time-slot:hover {
+            border-color: #0066cc;
+            background: #f0f9ff;
+        }
+        
+        .time-slot.selected {
+            border-color: #0066cc;
+            background: #0066cc;
+            color: white;
+        }
+        
+        .time-slot.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .stylist-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .stylist-card:hover {
+            border-color: #0066cc;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stylist-card.selected {
+            border-color: #0066cc;
+            background: #f0f9ff;
+        }
+        
+        .stylist-name {
+            font-weight: 600;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+        
+        .stylist-specialization {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .booking-card {
+                padding: 30px 20px;
+                margin: 0 10px;
+            }
+            
+            .booking-header h1 {
+                font-size: 2rem;
+            }
+            
+            .booking-steps {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .time-slots {
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <div class="booking-container">
+        <div class="booking-card">
+            <div class="booking-header">
+                <h1><i class="fas fa-calendar-check"></i> Đặt lịch hẹn</h1>
+                <p>Chọn dịch vụ và thời gian phù hợp với bạn</p>
+            </div>
+            
+            <div class="booking-steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <span>Chọn dịch vụ</span>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <span>Chọn stylist</span>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <span>Chọn thời gian</span>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <span>Xác nhận</span>
+                </div>
+            </div>
+            
+            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                <div style="background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid #dc2626;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <% errors.forEach(error => { %>
+                        <p style="margin: 5px 0;"><%= error.msg %></p>
+                    <% }); %>
+                </div>
+            <% } %>
+            
+            <form method="POST" action="/book-appointment" id="bookingForm">
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-cut"></i>
+                        Chọn dịch vụ
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service_id">Dịch vụ *</label>
+                        <select id="service_id" name="service_id" required>
+                            <option value="">-- Chọn dịch vụ --</option>
+                            <% services.forEach(service => { %>
+                                <option value="<%= service.id %>" data-price="<%= service.price %>" data-duration="<%= service.duration %>">
+                                    <%= service.name %> - <%= service.price.toLocaleString('vi-VN') %> VNĐ
+                                </option>
+                            <% }); %>
+                        </select>
+                        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                            <% errors.forEach(error => { %>
+                                <% if (error.param === 'service_id') { %>
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <%= error.msg %>
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                        <div class="service-info" id="service-info" style="display: none;">
+                            <p><strong><i class="fas fa-clock"></i> Thời gian thực hiện:</strong> <span id="service-duration"></span> phút</p>
+                            <p class="service-price"><i class="fas fa-tag"></i> Giá: <span id="service-price"></span> VNĐ</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-user-tie"></i>
+                        Chọn stylist
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stylist_id">Stylist *</label>
+                        <select id="stylist_id" name="stylist_id" required>
+                            <option value="">-- Chọn stylist --</option>
+                            <% stylists.forEach(stylist => { %>
+                                <option value="<%= stylist.id %>">
+                                    <%= stylist.name %> - <%= stylist.specialization %>
+                                </option>
+                            <% }); %>
+                        </select>
+                        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                            <% errors.forEach(error => { %>
+                                <% if (error.param === 'stylist_id') { %>
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <%= error.msg %>
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Chọn thời gian
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="appointment_date">Ngày hẹn *</label>
+                        <input type="date" id="appointment_date" name="appointment_date" required min="<%= new Date().toISOString().split('T')[0] %>">
+                        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                            <% errors.forEach(error => { %>
+                                <% if (error.param === 'appointment_date') { %>
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <%= error.msg %>
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="appointment_time">Giờ hẹn *</label>
+                        <select id="appointment_time" name="appointment_time" required>
+                            <option value="">-- Chọn giờ --</option>
+                            <option value="09:00">09:00</option>
+                            <option value="09:30">09:30</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="11:30">11:30</option>
+                            <option value="13:00">13:00</option>
+                            <option value="13:30">13:30</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                            <option value="15:30">15:30</option>
+                            <option value="16:00">16:00</option>
+                            <option value="16:30">16:30</option>
+                            <option value="17:00">17:00</option>
+                            <option value="17:30">17:30</option>
+                            <option value="18:00">18:00</option>
+                            <option value="18:30">18:30</option>
+                            <option value="19:00">19:00</option>
+                        </select>
+                        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                            <% errors.forEach(error => { %>
+                                <% if (error.param === 'appointment_time') { %>
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <%= error.msg %>
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-edit"></i>
+                        Ghi chú (tùy chọn)
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Yêu cầu đặc biệt</label>
+                        <textarea id="notes" name="notes" placeholder="Nhập yêu cầu đặc biệt hoặc ghi chú..."></textarea>
+                    </div>
+                </div>
+                
+                <button type="submit" class="booking-btn">
+                    <i class="fas fa-calendar-check"></i> 
+                    Đặt lịch hẹn
+                </button>
+            </form>
+            
+            <div class="back-link">
+                <a href="/">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hiển thị thông tin dịch vụ khi chọn
+        document.getElementById('service_id').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const serviceInfo = document.getElementById('service-info');
+            const serviceDuration = document.getElementById('service-duration');
+            const servicePrice = document.getElementById('service-price');
+            
+            if (this.value) {
+                const price = selectedOption.getAttribute('data-price');
+                const duration = selectedOption.getAttribute('data-duration');
+                
+                serviceDuration.textContent = duration;
+                servicePrice.textContent = parseInt(price).toLocaleString('vi-VN');
+                serviceInfo.style.display = 'block';
+                
+                // Cập nhật step
+                updateStep(1);
+            } else {
+                serviceInfo.style.display = 'none';
+            }
+        });
+        
+        // Cập nhật step khi chọn stylist
+        document.getElementById('stylist_id').addEventListener('change', function() {
+            if (this.value) {
+                updateStep(2);
+            }
+        });
+        
+        // Cập nhật step khi chọn thời gian
+        document.getElementById('appointment_date').addEventListener('change', function() {
+            if (this.value && document.getElementById('appointment_time').value) {
+                updateStep(3);
+            }
+        });
+        
+        document.getElementById('appointment_time').addEventListener('change', function() {
+            if (this.value && document.getElementById('appointment_date').value) {
+                updateStep(3);
+            }
+        });
+        
+        // Cập nhật step khi submit form
+        document.getElementById('bookingForm').addEventListener('submit', function() {
+            updateStep(4);
+        });
+        
+        function updateStep(stepNumber) {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, index) => {
+                if (index < stepNumber) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+        
+        // Đặt ngày tối thiểu là hôm nay
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('appointment_date').min = today;
+        
+        // Khởi tạo step đầu tiên
+        updateStep(1);
+    </script>
+</body>
+</html> 

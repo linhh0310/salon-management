@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Nhân viên - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 0 20px 10px;
+            color: #bdc3c7;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item.active {
+            background: #34495e;
+            border-left-color: #3498db;
+            color: #3498db;
+        }
+
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item-arrow {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            background: #f4f6f8;
+        }
+
+        /* Top Navigation */
+        .admin-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .hamburger-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .header-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 30px;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .content-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .content-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .breadcrumb span {
+            color: #7f8c8d;
+        }
+
+        /* Employee Detail Card */
+        .employee-detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .employee-header {
+            background: #f8fafc;
+            padding: 30px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .employee-photo {
+            width: 120px;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .employee-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .employee-photo i {
+            font-size: 3rem;
+            color: #9ca3af;
+        }
+
+        .employee-basic-info h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .employee-id {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 15px;
+        }
+
+        .employee-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .employee-content {
+            padding: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .info-section {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .info-value {
+            color: #1f2937;
+            text-align: right;
+        }
+
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .role-admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-manager {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-staff {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .role-stylist {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .role-receptionist {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-action {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #d97706;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-back {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #4b5563;
+        }
+
+        /* Footer */
+        .admin-footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+
+            .employee-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name">Admin</div>
+                <div class="profile-status">
+                    <i class="fas fa-circle"></i>
+                    Online
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">MENU ADMIN</div>
+                    <a href="/admin" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-home"></i>
+                            <span>Trang chủ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/appointments" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Lịch hẹn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/services" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cut"></i>
+                            <span>Dịch vụ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/stylists" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Stylist</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/products" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Quản lý sản phẩm</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/orders" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Đơn hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/reviews" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-star"></i>
+                            <span>Đánh giá</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/customers" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-users"></i>
+                            <span>Khách hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/contact" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-envelope"></i>
+                            <span>Tin nhắn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/employees" class="menu-item active">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Nhân viên</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/settings" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Navigation -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="hamburger-menu" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-title">Chi tiết Nhân viên</div>
+                </div>
+                <div class="header-right">
+                    <a href="/" class="header-link">
+                        <i class="fas fa-eye"></i>
+                        Xem website
+                    </a>
+                    <div class="admin-user">
+                        <i class="fas fa-user"></i>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1 class="content-title">Chi tiết Nhân viên</h1>
+                    <p class="content-subtitle">Xem thông tin chi tiết của nhân viên</p>
+                </div>
+                
+                <!-- Breadcrumb -->
+                <div class="breadcrumb">
+                    <a href="/admin/employees">Danh sách nhân viên</a> / <span>Chi tiết nhân viên</span>
+                </div>
+                
+                <!-- Employee Detail Card -->
+                <div class="employee-detail-card">
+                    <div class="employee-header">
+                        <div class="employee-photo">
+                            <% if (employee.photo) { %>
+                                <img src="<%= employee.photo %>" alt="<%= employee.full_name %>">
+                            <% } else { %>
+                                <i class="fas fa-user"></i>
+                            <% } %>
+                        </div>
+                        <div class="employee-basic-info">
+                            <h2><%= employee.full_name %></h2>
+                            <div class="employee-id">ID: <%= employee.employee_id %></div>
+                            <div class="employee-status status-<%= employee.status === 'active' ? 'active' : 'inactive' %>">
+                                <i class="fas fa-circle"></i>
+                                <%= employee.status === 'active' ? 'Hoạt động' : 'Không hoạt động' %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="employee-content">
+                        <div class="info-grid">
+                            <!-- Thông tin liên hệ -->
+                            <div class="info-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-address-book"></i>
+                                    Thông tin liên hệ
+                                </h3>
+                                <div class="info-row">
+                                    <span class="info-label">Email:</span>
+                                    <span class="info-value"><%= employee.email %></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Số điện thoại:</span>
+                                    <span class="info-value"><%= employee.phone || 'Chưa có' %></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Địa chỉ:</span>
+                                    <span class="info-value"><%= employee.address || 'Chưa có' %></span>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin cá nhân -->
+                            <div class="info-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-user"></i>
+                                    Thông tin cá nhân
+                                </h3>
+                                <div class="info-row">
+                                    <span class="info-label">Ngày sinh:</span>
+                                    <span class="info-value"><%= employee.birth_date ? new Date(employee.birth_date).toLocaleDateString('vi-VN') : 'Chưa có' %></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Nơi sinh:</span>
+                                    <span class="info-value"><%= employee.birth_place || 'Chưa có' %></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Giới tính:</span>
+                                    <span class="info-value">
+                                        <% if (employee.gender === 'male') { %>Nam<% } %>
+                                        <% if (employee.gender === 'female') { %>Nữ<% } %>
+                                        <% if (employee.gender === 'other') { %>Khác<% } %>
+                                        <% if (!employee.gender) { %>Chưa có<% } %>
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tình trạng hôn nhân:</span>
+                                    <span class="info-value">
+                                        <% if (employee.marital_status === 'single') { %>Độc thân<% } %>
+                                        <% if (employee.marital_status === 'married') { %>Đã kết hôn<% } %>
+                                        <% if (employee.marital_status === 'divorced') { %>Đã ly hôn<% } %>
+                                        <% if (employee.marital_status === 'widowed') { %>Góa<% } %>
+                                        <% if (!employee.marital_status) { %>Chưa có<% } %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin CMND -->
+                            <div class="info-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-id-card"></i>
+                                    Thông tin CMND
+                                </h3>
+                                <div class="info-row">
+                                    <span class="info-label">Số CMND:</span>
+                                    <span class="info-value"><%= employee.id_card || 'Chưa có' %></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Ngày cấp:</span>
+                                    <span class="info-value"><%= employee.issue_date ? new Date(employee.issue_date).toLocaleDateString('vi-VN') : 'Chưa có' %></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Nơi cấp:</span>
+                                    <span class="info-value"><%= employee.issue_place || 'Chưa có' %></span>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin công việc -->
+                            <div class="info-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-briefcase"></i>
+                                    Thông tin công việc
+                                </h3>
+                                <div class="info-row">
+                                    <span class="info-label">Chức vụ:</span>
+                                    <span class="info-value">
+                                        <span class="role-badge role-<%= employee.position %>">
+                                            <% if (employee.position === 'admin') { %>Admin<% } %>
+                                            <% if (employee.position === 'manager') { %>Manager<% } %>
+                                            <% if (employee.position === 'staff') { %>Staff<% } %>
+                                            <% if (employee.position === 'stylist') { %>Stylist<% } %>
+                                            <% if (employee.position === 'receptionist') { %>Receptionist<% } %>
+                                            <% if (!employee.position) { %>Chưa có<% } %>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Bằng cấp:</span>
+                                    <span class="info-value">
+                                        <% if (employee.qualification === 'high_school') { %>Trung học phổ thông<% } %>
+                                        <% if (employee.qualification === 'college') { %>Cao đẳng<% } %>
+                                        <% if (employee.qualification === 'university') { %>Đại học<% } %>
+                                        <% if (employee.qualification === 'master') { %>Thạc sĩ<% } %>
+                                        <% if (employee.qualification === 'phd') { %>Tiến sĩ<% } %>
+                                        <% if (!employee.qualification) { %>Chưa có<% } %>
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Ngày tham gia:</span>
+                                    <span class="info-value"><%= new Date(employee.created_at).toLocaleDateString('vi-VN') %></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="/admin/employees/<%= employee.id %>/edit" class="btn-action btn-edit">
+                                <i class="fas fa-edit"></i> Chỉnh sửa
+                            </a>
+                            <button class="btn-action btn-delete" onclick="deleteEmployee(<%= employee.id %>)">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                            <a href="/admin/employees" class="btn-action btn-back">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="admin-footer">
+                <div>Copyright © 2014-2015 SÀI GÒN WEB</div>
+                <div>Version 1.0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Delete employee
+        function deleteEmployee(id) {
+            if (confirm('Bạn có chắc muốn xóa nhân viên này?')) {
+                fetch(`/admin/employees/${id}/delete`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Nhân viên đã được xóa thành công!');
+                        window.location.href = '/admin/employees';
+                    } else {
+                        alert('Có lỗi xảy ra!');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html> 

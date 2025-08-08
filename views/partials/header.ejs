@@ -1,0 +1,899 @@
+<header class="header">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="Lyn Salon" class="logo">
+                    <span class="logo-text">Lyn Salon</span>
+                </a>
+            </div>
+            
+            <nav class="nav">
+                <ul class="nav-menu">
+                    <li><a href="/" class="nav-link active">Trang chủ</a></li>
+                    <li><a href="/products" class="nav-link">Sản phẩm</a></li>
+                    <li><a href="/products/best-selling" class="nav-link">Bán chạy</a></li>
+                    <li><a href="/services" class="nav-link">Dịch vụ</a></li>
+                    <li><a href="/stylists" class="nav-link">Stylist</a></li>
+                    <li><a href="/book-appointment" class="nav-link">Đặt lịch</a></li>
+                </ul>
+            </nav>
+            
+            <div class="nav-auth">
+                <% if (locals.user) { %>
+                    <!-- Giỏ hàng cho user -->
+                    <% if (user.role !== 'admin') { %>
+                        <div class="cart-container">
+                            <a href="/cart" class="btn btn-cart">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="cart-count" id="header-cart-count">0</span>
+                            </a>
+                        </div>
+                    <% } %>
+                    
+                    <!-- Dropdown menu cho user -->
+                    <div class="user-dropdown">
+                        <button class="btn btn-user" onclick="toggleUserDropdown()">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="user-name"><%= user.name %></span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <% if (user.role === 'admin') { %>
+                                <a href="/admin" class="dropdown-item">
+                                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                                </a>
+                            <% } else { %>
+                                <a href="/" class="dropdown-item">
+                                    <i class="fas fa-home"></i> Trang chủ
+                                </a>
+                                <a href="/book-appointment" class="dropdown-item">
+                                    <i class="fas fa-calendar"></i> Đặt lịch
+                                </a>
+                                <a href="/cart" class="dropdown-item">
+                                    <i class="fas fa-shopping-cart"></i> Giỏ hàng
+                                </a>
+                                <a href="/services" class="dropdown-item">
+                                    <i class="fas fa-cut"></i> Dịch vụ
+                                </a>
+                            <% } %>
+                            <div class="dropdown-divider"></div>
+                            <a href="/logout" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <button class="btn btn-outline" onclick="openLoginModal()">Đăng nhập</button>
+                    <button class="btn btn-primary" onclick="openRegisterModal()">Đăng ký</button>
+                <% } %>
+            </div>
+            
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<style>
+.header {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    padding: 1rem 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+}
+
+.logo {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2rem;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #007bff;
+}
+
+.nav-auth {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Cart Container */
+.cart-container {
+    position: relative;
+}
+
+.btn-cart {
+    background: #28a745;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.btn-cart:hover {
+    background: #218838;
+    color: white;
+}
+
+.cart-count {
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+/* User Dropdown */
+.user-dropdown {
+    position: relative;
+}
+
+.btn-user {
+    background: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-user:hover {
+    background: #0056b3;
+}
+
+.user-name {
+    font-weight: 500;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    min-width: 200px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.3s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: #f8f9fa;
+    color: #007bff;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 8px 0;
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-outline {
+    border: 2px solid #007bff;
+    color: #007bff;
+}
+
+.btn-outline:hover {
+    background: #007bff;
+    color: white;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background: #333;
+    margin: 3px 0;
+    transition: 0.3s;
+}
+
+@media (max-width: 768px) {
+    .nav {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background-color: white;
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+        padding: 2rem 0;
+    }
+    
+    .nav.active {
+        left: 0;
+    }
+    
+    .nav ul {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .nav-auth {
+        display: none;
+    }
+    
+    .hamburger {
+        display: flex;
+    }
+    
+    .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .hamburger.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    
+    .hamburger.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.modal h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.modal .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.modal-footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.modal-footer a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.modal-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Error message styles */
+.error-message {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Success message styles */
+.success-message {
+    color: #28a745;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+</style>
+
+<script>
+var hamburger = document.querySelector(".hamburger");
+var nav = document.querySelector(".nav");
+
+hamburger.addEventListener("click", function() {
+    hamburger.classList.toggle("active");
+    nav.classList.toggle("active");
+});
+
+document.querySelectorAll(".nav-link").forEach(function(n) { 
+    n.addEventListener("click", function() {
+        hamburger.classList.remove("active");
+        nav.classList.remove("active");
+    });
+});
+
+// Modal functions
+function openLoginModal() {
+    document.getElementById('loginModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLoginModal() {
+    document.getElementById('loginModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function openRegisterModal() {
+    document.getElementById('registerModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRegisterModal() {
+    document.getElementById('registerModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function switchToRegister() {
+    closeLoginModal();
+    openRegisterModal();
+}
+
+function switchToLogin() {
+    closeRegisterModal();
+    openLoginModal();
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    var loginModal = document.getElementById('loginModal');
+    var registerModal = document.getElementById('registerModal');
+    
+    if (event.target === loginModal) {
+        closeLoginModal();
+    }
+    if (event.target === registerModal) {
+        closeRegisterModal();
+    }
+}
+
+// Handle form submissions
+document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra và load giỏ hàng của user hiện tại
+    var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (currentUser.id) {
+        var userCart = localStorage.getItem('userCart_' + currentUser.id);
+        if (userCart) {
+            localStorage.setItem('cart', userCart);
+        }
+    }
+    
+    // Update cart count on page load
+    updateCartCount();
+    
+    var loginForm = document.getElementById('loginForm');
+    var registerForm = document.getElementById('registerForm');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(loginForm);
+            var data = Object.fromEntries(formData);
+            
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Xử lý giỏ hàng khi đăng nhập thành công
+                    if (data.user && window.cartManager) {
+                        window.cartManager.handleLoginSuccess(data.user);
+                    }
+                    showMessage('Đăng nhập thành công!', 'success');
+                    setTimeout(() => {
+                        // Redirect based on user role
+                        window.location.href = data.user && data.user.role === 'admin' ? '/admin' : '/';
+                    }, 1500);
+                } else {
+                    showMessage(data.message || 'Đăng nhập thất bại!', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                showMessage('Có lỗi xảy ra!', 'error');
+            });
+        });
+    }
+    
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(registerForm);
+            var data = Object.fromEntries(formData);
+            
+            // Validate password confirmation
+            if (data.password !== data.confirmPassword) {
+                showMessage('Mật khẩu xác nhận không khớp!', 'error');
+                return;
+            }
+            
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Xử lý giỏ hàng khi đăng ký thành công
+                    if (data.user && window.cartManager) {
+                        window.cartManager.handleRegisterSuccess(data.user);
+                    }
+                    showMessage(data.message || 'Đăng ký thành công!', 'success');
+                    setTimeout(() => {
+                        // Redirect to login page after successful registration
+                        if (data.redirect) {
+                            window.location.href = data.redirect;
+                        } else {
+                            window.location.href = '/login';
+                        }
+                    }, 1500);
+                } else {
+                    showMessage(data.message || 'Đăng ký thất bại!', 'error');
+                    
+                    // Display field-specific errors if available
+                    if (data.errors) {
+                        data.errors.forEach(function(error) {
+                            var fieldName = error.param;
+                            var field = document.querySelector('[name="' + fieldName + '"]');
+                            if (field) {
+                                var errorDiv = document.createElement('div');
+                                errorDiv.className = 'error-message';
+                                errorDiv.textContent = error.msg;
+                                errorDiv.style.color = '#dc3545';
+                                errorDiv.style.fontSize = '12px';
+                                errorDiv.style.marginTop = '5px';
+                                field.parentNode.appendChild(errorDiv);
+                            }
+                        });
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Register error:', error);
+                showMessage('Có lỗi xảy ra!', 'error');
+            });
+        });
+    }
+});
+
+// User dropdown functions
+function toggleUserDropdown() {
+    var dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    var dropdown = document.getElementById('userDropdown');
+    var userButton = document.querySelector('.btn-user');
+    
+    if (dropdown && !userButton.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+
+// Cart functions
+function updateCartCount() {
+    var cartCount = document.getElementById('header-cart-count');
+    if (cartCount) {
+        var cart = JSON.parse(localStorage.getItem('cart')) || [];
+        var totalItems = cart.reduce(function(total, item) { return total + item.quantity; }, 0);
+        cartCount.textContent = totalItems;
+    }
+}
+
+// Thêm function để xử lý giỏ hàng khi đăng nhập
+function handleLoginSuccess(userData) {
+    // Lưu thông tin user vào localStorage để tracking
+    localStorage.setItem('currentUser', JSON.stringify({
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        role: userData.role
+    }));
+    
+    // Kiểm tra xem có giỏ hàng của user khác không
+    var currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+    var lastUserCart = localStorage.getItem('lastUserCart');
+    var lastUserId = localStorage.getItem('lastUserId');
+    
+    if (lastUserId && lastUserId !== userData.id.toString()) {
+        // Nếu đăng nhập user khác, hỏi có muốn chuyển giỏ hàng không
+        if (currentCart.length > 0) {
+            if (confirm('Bạn có muốn chuyển giỏ hàng hiện tại sang tài khoản mới không?')) {
+                // Lưu giỏ hàng hiện tại cho user mới
+                localStorage.setItem('userCart_' + userData.id, JSON.stringify(currentCart));
+            } else {
+                // Xóa giỏ hàng hiện tại
+                localStorage.removeItem('cart');
+            }
+        }
+        
+        // Load giỏ hàng của user mới nếu có
+        var userCart = localStorage.getItem('userCart_' + userData.id);
+        if (userCart) {
+            localStorage.setItem('cart', userCart);
+        }
+    }
+    
+    // Cập nhật thông tin tracking
+    localStorage.setItem('lastUserId', userData.id.toString());
+    localStorage.setItem('lastUserCart', JSON.stringify(currentCart));
+    
+    // Cập nhật hiển thị giỏ hàng
+    updateCartCount();
+}
+
+// Thêm function để xử lý khi đăng xuất
+function handleLogout() {
+    // Lưu giỏ hàng hiện tại cho user
+    var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    var currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    if (currentUser.id && currentCart.length > 0) {
+        localStorage.setItem('userCart_' + currentUser.id, JSON.stringify(currentCart));
+    }
+    
+    // Xóa thông tin user hiện tại
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('lastUserId');
+    localStorage.removeItem('lastUserCart');
+    
+    // Xóa giỏ hàng hiện tại
+    localStorage.removeItem('cart');
+    
+    // Cập nhật hiển thị
+    updateCartCount();
+}
+
+function showCartTab() {
+    // Store the tab to show in localStorage
+    localStorage.setItem('showTab', 'cart');
+    window.location.href = '/cart';
+}
+
+function showAppointmentsTab() {
+    localStorage.setItem('showTab', 'appointments');
+    window.location.href = '/book-appointment';
+}
+
+function showProfileTab() {
+    localStorage.setItem('showTab', 'profile');
+    window.location.href = '/';
+}
+
+// Listen for cart updates from other pages
+window.addEventListener('storage', function(e) {
+    if (e.key === 'cart') {
+        updateCartCount();
+        // Tự động lưu giỏ hàng cho user hiện tại
+        var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (currentUser.id) {
+            var cart = JSON.parse(localStorage.getItem('cart')) || [];
+            localStorage.setItem('userCart_' + currentUser.id, JSON.stringify(cart));
+        }
+    }
+});
+
+// Update cart count when cart changes
+function updateHeaderCartCount() {
+    updateCartCount();
+}
+
+function showMessage(message, type) {
+    // Remove existing messages
+    var existingMessages = document.querySelectorAll('.message');
+    existingMessages.forEach(function(msg) { msg.remove(); });
+    
+    // Create new message
+    var messageDiv = document.createElement('div');
+    messageDiv.className = 'message ' + type + '-message';
+    messageDiv.textContent = message;
+    messageDiv.style.cssText = 
+        'position: fixed;' +
+        'top: 20px;' +
+        'right: 20px;' +
+        'padding: 15px 20px;' +
+        'border-radius: 8px;' +
+        'color: white;' +
+        'font-weight: 500;' +
+        'z-index: 3000;' +
+        'animation: slideIn 0.3s ease-out;';
+    
+    if (type === 'success') {
+        messageDiv.style.backgroundColor = '#28a745';
+    } else {
+        messageDiv.style.backgroundColor = '#dc3545';
+    }
+    
+    document.body.appendChild(messageDiv);
+    
+    // Remove message after 3 seconds
+    setTimeout(function() {
+        messageDiv.remove();
+    }, 3000);
+}
+
+// Add slideIn animation
+var style = document.createElement('style');
+style.textContent = 
+    '@keyframes slideIn {' +
+    '    from {' +
+    '        opacity: 0;' +
+    '        transform: translateX(100%);' +
+    '    }' +
+    '    to {' +
+    '        opacity: 1;' +
+    '        transform: translateX(0);' +
+    '    }' +
+    '}';
+document.head.appendChild(style);
+</script>
+
+<script src="/js/cart-manager.js"></script>
+<script src="/js/chat-widget.js"></script>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLoginModal()">&times;</span>
+        <h2>Đăng nhập</h2>
+        <form id="loginForm" method="POST" action="/login">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Mật khẩu</label>
+                <input type="password" id="loginPassword" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+        </form>
+        <p class="modal-footer">
+            Chưa có tài khoản? <a href="#" onclick="switchToRegister()">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRegisterModal()">&times;</span>
+        <h2>Đăng ký</h2>
+        <form id="registerForm" method="POST" action="/register">
+            <div class="form-group">
+                <label for="registerName">Họ tên</label>
+                <input type="text" id="registerName" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="registerPhone">Số điện thoại</label>
+                <input type="tel" id="registerPhone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Mật khẩu</label>
+                <input type="password" id="registerPassword" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="registerConfirmPassword">Xác nhận mật khẩu</label>
+                <input type="password" id="registerConfirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Đăng ký</button>
+        </form>
+        <p class="modal-footer">
+            Đã có tài khoản? <a href="#" onclick="switchToLogin()">Đăng nhập</a>
+        </p>
+    </div>
+</div> 

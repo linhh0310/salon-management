@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Hero Banner Styles */
+        .main-hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100"><path d="M0,100 L1000,50 L1000,100 Z" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat bottom;
+            background-size: cover;
+        }
+        
+        .hero-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-text-content {
+            color: white;
+            flex: 1;
+            padding-right: 50px;
+        }
+        
+        .hero-text-content h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+        
+        .hero-text-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .hero-text-content h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .hero-text-content .collection {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .hero-models {
+            flex: 1;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .model-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            color: white;
+            min-width: 200px;
+        }
+        
+        .model-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .model-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .model-card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* News Section */
+        .news-section {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+        
+        .news-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 50px;
+        }
+        
+        .news-carousel {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scroll-behavior: smooth;
+        }
+        
+        .news-card {
+            min-width: 350px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .news-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .news-card-content {
+            padding: 20px;
+        }
+        
+        .news-card-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #1e3a8a;
+        }
+        
+        .news-card-content p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        /* Shop Section */
+        .shop-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+        
+        .shop-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .shop-title .blue-bar {
+            width: 4px;
+            height: 40px;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+        
+        .shop-title h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+        
+        .shop-title p {
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
+        .shop-banner {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .shop-banner-left {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .shop-banner-left img {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+        
+        .shop-banner-left h3 {
+            font-size: 1.5rem;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        
+        .shop-banner-right {
+            flex: 1;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border-radius: 15px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+        }
+        
+        .shop-banner-right h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .shop-banner-right img {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+        }
+        
+        /* Products Section */
+        .products-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+        
+        .products-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 50px;
+        }
+        
+        .products-carousel {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scroll-behavior: smooth;
+        }
+        
+        .product-card {
+            min-width: 300px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #3b82f6;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .product-image {
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .product-content {
+            padding: 20px;
+        }
+        
+        .product-content h4 {
+            font-size: 1.1rem;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        
+        .product-content .price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+        
+        .product-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .product-features li {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .product-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        /* Nút mua hàng */
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-buy-now {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.3s;
+            flex: 1;
+        }
+        
+        .btn-buy-now:hover {
+            background: #0056b3;
+        }
+        
+        .btn-add-cart {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.3s;
+            flex: 1;
+        }
+        
+        .btn-add-cart:hover {
+            background: #1e7e34;
+        }
+        
+        .btn-buy-now:disabled,
+        .btn-add-cart:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        /* Navigation arrows */
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .nav-arrow {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-arrow:hover {
+            background: #1e3a8a;
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-text-content {
+                padding-right: 0;
+                margin-bottom: 30px;
+            }
+            
+            .hero-text-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-text-content h2 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-models {
+                flex-wrap: wrap;
+            }
+            
+            .model-card {
+                min-width: 150px;
+            }
+            
+            .shop-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .news-carousel,
+            .products-carousel {
+                padding: 20px;
+            }
+            
+            .news-card,
+            .product-card {
+                min-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <!-- Original Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-left">
+                    <div class="hero-images">
+                        <div class="image-grid">
+                            <div class="image-item stylist">
+                                <img src="/images/stylist.jpg" alt="Stylist">
+                            </div>
+                            <div class="image-item client-1">
+                                <img src="/images/client-1.jpg" alt="Client 1">
+                            </div>
+                            <div class="image-item client-2">
+                                <img src="/images/client-2.jpg" alt="Client 2">
+                            </div>
+                        </div>
+                        <div class="badge">
+                            <div class="badge-content">
+                                <span class="badge-text">Designed By Hair Stylist Masters</span>
+                                <div class="badge-center">
+                                    <h3>LYN Salon</h3>
+                                    <div class="stars">★★★★★</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="hero-logo">
+                        <h1>LYN Salon</h1>
+                    </div>
+                    <div class="hero-text">
+                        <h2>UỐN NHUỘM THIẾT KẾ</h2>
+                        <h2>PHỤC HỒI CHUYÊN SÂU</h2>
+                        <h2>LIPID BOND 2025</h2>
+                    </div>
+                    <div class="hero-features">
+                        <div class="feature-tag">3IN1</div>
+                        <ul class="feature-list">
+                            <li>TÓC KHỎE TRONG MƯỢT NGOÀI</li>
+                            <li>TIẾT KIỆM THỜI GIAN CHỌN KIỂU VÀ CHĂM SÓC</li>
+                            <li>SÁNG BỪNG NGŨ QUAN - RỘNG ĐƯỜNG TÀI LỘC</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-indicators">
+                <span class="indicator active"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- DỊCH VỤ TÓC Section -->
+    <section class="services">
+        <div class="container">
+            <h2 class="section-title">DỊCH VỤ TÓC</h2>
+            <div class="services-grid">
+                <% services.filter(service => 
+                    service.name.toLowerCase().includes('cắt tóc') || 
+                    service.name.toLowerCase().includes('thay đổi màu') || 
+                    service.name.toLowerCase().includes('uốn') ||
+                    service.name.toLowerCase().includes('nhuộm') ||
+                    service.name.toLowerCase().includes('duỗi')
+                ).forEach(function(service) { %>
+                    <div class="service-card">
+                        <div class="service-image">
+                            <img src="<%= service.image_url || '/images/service-default.jpg' %>" alt="<%= service.name %>">
+                        </div>
+                        <div class="service-content">
+                            <h3><%= service.name %></h3>
+                            <p class="price">Giá từ <%= service.price.toLocaleString('vi-VN') %>VNĐ</p>
+                            <a href="/services" class="learn-more">Tìm hiểu thêm ></a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- THƯ GIÃN VÀ CHĂM SÓC DA Section -->
+    <section class="relaxation">
+        <div class="container">
+            <h2 class="section-title">THƯ GIÃN VÀ CHĂM SÓC DA</h2>
+            <div class="relaxation-grid">
+                <% services.filter(service => 
+                    service.name.toLowerCase().includes('gội dưỡng') || 
+                    service.name.toLowerCase().includes('lấy ráy') ||
+                    service.name.toLowerCase().includes('massage') ||
+                    service.name.toLowerCase().includes('chăm sóc da') ||
+                    service.name.toLowerCase().includes('thư giãn')
+                ).forEach(function(service) { %>
+                    <div class="relaxation-card">
+                        <div class="relaxation-image">
+                            <img src="<%= service.image_url || '/images/service-default.jpg' %>" alt="<%= service.name %>">
+                        </div>
+                        <div class="relaxation-content">
+                            <h3><%= service.name %></h3>
+                            <p class="price">Giá từ <%= service.price.toLocaleString('vi-VN') %>VNĐ</p>
+                            <a href="/services" class="learn-more">Tìm hiểu thêm ></a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section class="booking-section">
+        <div class="container">
+            <div class="booking-content">
+                <div class="booking-card">
+                    <h3>ĐẶT LỊCH GIỮ CHỖ CHỈ 30 GIÂY</h3>
+                    <p>Cắt xong trả tiền, hủy lịch không sao</p>
+                    <form class="booking-form" action="/book-appointment" method="GET">
+                        <div class="form-group">
+                            <input type="tel" placeholder="Nhập SĐT để đặt lịch" required>
+                            <button type="submit" class="btn btn-primary">ĐẶT LỊCH NGAY</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="review-card">
+                    <h3>MỜI ANH ĐÁNH GIÁ CHẤT LƯỢNG PHỤC VỤ</h3>
+                    <p>Phản hồi của anh sẽ giúp chúng em cải thiện chất lượng dịch vụ tốt hơn</p>
+                    <div class="rating">
+                        <i class="fas fa-star filled"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Hero Banner -->
+    <section class="main-hero">
+        <div class="hero-banner">
+            <div class="hero-text-content">
+                <div class="collection">I SHINE COLLECTION - 'VIBE' NÀO CŨNG TOẢ SÁNG</div>
+                <h1>TREND HAIR</h1>
+                <h2>MEN</h2>
+                <h2>HAIRSTYLE</h2>
+                <h3>AW 25-26</h3>
+            </div>
+            <div class="hero-models">
+                <div class="model-card">
+                    <img src="/images/model1.jpg" alt="Model 2" onerror="this.src='https://via.placeholder.com/120x120/1e3a8a/ffffff?text=Model+2'">
+                    <h4>Kiểu tóc hiện đại</h4>
+                    <p>Phong cách nam tính</p>
+                </div>
+                <div class="model-card">
+                    <img src="/images/model2.jpg" alt="Model 2" onerror="this.src='https://via.placeholder.com/120x120/1e3a8a/ffffff?text=Model+2'">
+                    <h4>Undercut phong cách</h4>
+                    <p>Thời trang & nổi bật</p>
+                </div>
+                <div class="model-card">
+                    <img src="/images/model3.jpg" alt="Model 3" onerror="this.src='https://via.placeholder.com/120x120/60a5fa/ffffff?text=Model+3'">
+                    <h4>Fade đẹp mắt</h4>
+                    <p>Chuyên nghiệp</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Blocks Section -->
+    <section class="content-blocks" style="padding: 60px 0; background: white;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div class="content-block" style="background: #f8fafc; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <img src="/images/brother-collection.jpg" alt="Bộ sưu tập anh trai" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x200/3b82f6/ffffff?text=Bộ+sưu+tập+anh+trai'">
+                    <div style="padding: 20px;">
+                        <h3 style="color: #1e3a8a; font-size: 1.3rem; margin-bottom: 10px;">BỘ SƯU TẬP ANH TRAI SAY HAIR</h3>
+                        <p style="color: #64748b;">Phong cách nam tính, hiện đại và đầy cá tính</p>
+                    </div>
+                </div>
+                <div class="content-block" style="background: #f8fafc; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <img src="/images/k-perm.jpg" alt="K-Perm Ready" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x200/1e3a8a/ffffff?text=K-PERM+READY'">
+                    <div style="padding: 20px;">
+                        <h3 style="color: #1e3a8a; font-size: 1.3rem; margin-bottom: 10px;">BTS K-PERM READY for NEW GAME</h3>
+                        <p style="color: #64748b;">Kiểu tóc uốn đẹp, phong cách Hàn Quốc</p>
+                    </div>
+                </div>
+                <div class="content-block" style="background: #f8fafc; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <img src="/images/bad-boy.jpg" alt="Bad Boy Style" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x200/60a5fa/ffffff?text=BAD+BOY'">
+                    <div style="padding: 20px;">
+                        <h3 style="color: #1e3a8a; font-size: 1.3rem; margin-bottom: 10px;">BAD BOY</h3>
+                        <p style="color: #64748b;">Phong cách cá tính, mạnh mẽ và nổi bật</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="news-section">
+        <div class="container">
+            <h2 class="news-title">TIN TỨC VỀ LYN SALON</h2>
+            <div class="news-carousel">
+                <div class="news-card">
+                    <img src="/images/news1.jpg" alt="CEO LYN Salon" onerror="this.src='https://via.placeholder.com/350x200/3b82f6/ffffff?text=CEO+LYN+Salon'">
+                    <div class="news-card-content">
+                        <h4>CEO LYN Salon kể chuyện từ bỏ công nghiệp hóa tay nghề stylist</h4>
+                        <p>Khẳng định không phải cứ có tiền là muốn làm gì cũng được, chất lượng vẫn là ưu tiên hàng đầu...</p>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <img src="/images/news2.jpg" alt="LYN Salon Building" onerror="this.src='https://via.placeholder.com/350x200/1e3a8a/ffffff?text=LYN+Salon+Building'">
+                    <div class="news-card-content">
+                        <h4>LYN Salon đặt mục tiêu 100 triệu USD doanh thu vào 2028</h4>
+                        <p>Chuỗi salon tóc nam hàng đầu Việt Nam với định hướng phát triển bền vững và chất lượng...</p>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <img src="/images/news3.jpg" alt="Training Session" onerror="this.src='https://via.placeholder.com/350x200/60a5fa/ffffff?text=Training+Session'">
+                    <div class="news-card-content">
+                        <h4>Thói quen bình thường tạo ra những điều phi thường ở LYN Salon</h4>
+                        <p>Quy trình đào tạo chuyên nghiệp và cam kết chất lượng dịch vụ hàng đầu...</p>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <img src="/images/news4.jpg" alt="Hair Styling" onerror="this.src='https://via.placeholder.com/350x200/3b82f6/ffffff?text=Hair+Styling'">
+                    <div class="news-card-content">
+                        <h4>Chuỗi cắt tóc nam với 1000+ khách hàng tìm đường</h4>
+                        <p>Dịch vụ chất lượng cao với đội ngũ stylist chuyên nghiệp và tận tâm...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-nav">
+                <button class="nav-arrow" onclick="scrollCarousel('news', -1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="nav-arrow" onclick="scrollCarousel('news', 1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shop Section -->
+    <section class="shop-section">
+        <div class="shop-header">
+            <div class="shop-title">
+                <div class="blue-bar"></div>
+                <div>
+                    <h2>LYN SALON SHOP</h2>
+                    <p>Mỹ phẩm nam cao cấp chính hãng</p>
+                </div>
+            </div>
+            <a href="/shop" style="color: #3b82f6; text-decoration: none; font-weight: 600;">Xem tất cả ></a>
+        </div>
+        
+        <div class="shop-banner">
+            <div class="shop-banner-left">
+                <img src="/images/glanzen-product.jpg" alt="GLÄNZEN Product" onerror="this.src=''">
+                <h3>XỊT TẠO PHỒNG GLANZEN BOOSTER X2</h3>
+                <p style="color: #64748b;">Tạo phồng và bảo vệ tóc hiệu quả</p>
+            </div>
+            <div class="shop-banner-right">
+                <h3>TÓC PHỒNG KHÔNG CỒNG KỀNH</h3>
+                <img src="/images/glanzen-spray.jpg" alt="GLÄNZEN Spray" onerror="this.src='https://via.placeholder.com/100x100/ffffff/000000?text=SPRAY'">
+                <p>Giải pháp tạo kiểu tóc hoàn hảo</p>
+            </div>
+        </div>
+            
+        <div class="products-carousel">
+            <div class="product-card">
+                <div class="product-badge">LYN SALON</div>
+                <div class="product-image">
+                    <img src="/images/product1.jpg" alt="Xịt tạo kiểu" onerror="this.src='https://via.placeholder.com/80x80/3b82f6/ffffff?text=SPRAY'">
+                </div>
+                <div class="product-content">
+                    <h4>Xịt tạo kiểu tóc Glanzen X2 Booster</h4>
+                    <div class="price">272.000 VNĐ</div>
+                    <ul class="product-features">
+                        <li>Tạo Phồng Và Bảo Vệ Tóc</li>
+                        <li>Vòi Xịt Cao Cấp</li>
+                        <li>Mùi Hương Quyến Rũ</li>
+                    </ul>
+                    <div class="product-actions">
+                        <button class="btn-buy-now" onclick="buyNow(1)">Mua ngay</button>
+                        <button class="btn-add-cart" onclick="addToCart(1)">Giỏ hàng</button>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-badge">LYN SALON</div>
+                <div class="product-image">
+                    <img src="/images/product2.jpg" alt="Serum dưỡng da" onerror="this.src='https://via.placeholder.com/80x80/1e3a8a/ffffff?text=SERUM'">
+                </div>
+                <div class="product-content">
+                    <h4>Tinh chất dưỡng da cho nam Serum Dr.FORSKIN</h4>
+                    <div class="price">499.000 VNĐ</div>
+                    <ul class="product-features">
+                        <li>Dưỡng Da 7 Trong 1 Tiện Lợi</li>
+                        <li>Phục Hồi Da Cháy Nồng</li>
+                        <li>Phù Hợp Với Nhiều Loại Da</li>
+                    </ul>
+                    <div class="product-actions">
+                        <button class="btn-buy-now" onclick="buyNow(2)">Mua ngay</button>
+                        <button class="btn-add-cart" onclick="addToCart(2)">Giỏ hàng</button>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-badge">LYN SALON</div>
+                <div class="product-image">
+                    <img src="/images/product3.jpg" alt="Sáp vuốt tóc" onerror="this.src='https://via.placeholder.com/80x80/60a5fa/ffffff?text=WAX'">
+                </div>
+                <div class="product-content">
+                    <h4>Sáp vuốt tóc nam Kevin Murphy Rough Rider</h4>
+                    <div class="price">319.000 VNĐ</div>
+                    <ul class="product-features">
+                        <li>Giữ nếp lâu bền</li>
+                        <li>Kết cấu tự nhiên</li>
+                        <li>Dễ gội sạch</li>
+                    </ul>
+                    <div class="product-actions">
+                        <button class="btn-buy-now" onclick="buyNow(3)">Mua ngay</button>
+                        <button class="btn-add-cart" onclick="addToCart(3)">Giỏ hàng</button>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-badge">LYN SALON</div>
+                <div class="product-image">
+                    <img src="/images/product4.jpg" alt="Clay Wax" onerror="this.src='https://via.placeholder.com/80x80/3b82f6/ffffff?text=CLAY'">
+                </div>
+                <div class="product-content">
+                    <h4>Sáp vuốt tóc Glanzen Clay Wax - Giữ nếp</h4>
+                    <div class="price">189.000 VNĐ</div>
+                    <ul class="product-features">
+                        <li>Giữ nếp tự nhiên</li>
+                        <li>Không bết dính</li>
+                        <li>Phù hợp mọi kiểu tóc</li>
+                    </ul>
+                    <div class="product-actions">
+                        <button class="btn-buy-now" onclick="buyNow(4)">Mua ngay</button>
+                        <button class="btn-add-cart" onclick="addToCart(4)">Giỏ hàng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Best Selling Products Section -->
+    <section class="products-section">
+        <div class="container">
+            <h2 class="products-title">SẢN PHẨM BÁN CHẠY ĐƯỢC CẬP NHẬT LIÊN TỤC</h2>
+            <div class="products-carousel" id="best-selling-carousel">
+                <!-- Sản phẩm sẽ được load từ API -->
+                <div class="loading">Đang tải sản phẩm bán chạy...</div>
+            </div>
+            <div class="carousel-nav">
+                <button class="nav-arrow" onclick="scrollCarousel('best-selling', -1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="nav-arrow" onclick="scrollCarousel('best-selling', 1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-buttons">
+        <button class="floating-btn scroll-top" onclick="scrollToTop()">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <button class="floating-btn call-btn" onclick="callUs()">
+            <i class="fas fa-phone"></i>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>LYN Salon</h3>
+                    <p>Salon tóc nam hàng đầu Việt Nam</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liên hệ</h4>
+                    <p>Hotline: 1900 1234</p>
+                    <p>Email: info@lynsalon.com</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Theo dõi</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 LYN Salon. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        function scrollCarousel(type, direction) {
+                    var carousel = document.querySelector('.' + type + '-carousel');
+        var scrollAmount = 400;
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        // Load sản phẩm bán chạy từ API
+        async function loadBestSellingProducts() {
+            try {
+                        var response = await fetch('/products/api/best-selling');
+        var data = await response.json();
+                
+                if (data.success && data.products) {
+                    var carousel = document.getElementById('best-selling-carousel');
+                    carousel.innerHTML = '';
+                    
+                    data.products.forEach(function(product, index) {
+                        var productCard = document.createElement('div');
+                        productCard.className = 'product-card';
+                        productCard.innerHTML = 
+                            '<div class="product-badge">TOP ' + (index + 1) + '</div>' +
+                            '<div class="product-image">' +
+                                '<img src="' + product.image_url + '" alt="' + product.name + '" onerror="this.src=\'/images/product1.jpg\'">' +
+                            '</div>' +
+                            '<div class="product-content">' +
+                                '<h4>' + product.name + '</h4>' +
+                                '<div class="price">' + product.price.toLocaleString('vi-VN') + ' VNĐ</div>' +
+                                '<div style="font-size: 0.9rem; color: #28a745; margin-bottom: 10px;">Đã bán: ' + (product.sales_count || 0) + '</div>' +
+                                '<ul class="product-features">' +
+                                    (product.features ? product.features.slice(0, 3).map(function(feature) { return '<li>' + feature + '</li>'; }).join('') : '') +
+                                '</ul>' +
+                                '<div class="product-actions">' +
+                                    '<button class="btn-buy-now" onclick="buyNow(' + product.id + ')">Mua ngay</button>' +
+                                    '<button class="btn-add-cart" onclick="addToCart(' + product.id + ')">Giỏ hàng</button>' +
+                                '</div>' +
+                            '</div>';
+                        carousel.appendChild(productCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading best selling products:', error);
+            }
+        }
+
+        // Load sản phẩm bán chạy khi trang được tải
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBestSellingProducts();
+        });
+        
+        // Functions cho nút mua hàng
+        function buyNow(productId) {
+            alert('Chức năng mua ngay sẽ được phát triển sau!');
+            console.log('Mua ngay sản phẩm ID:', productId);
+        }
+        
+        function addToCart(productId) {
+            alert('Đã thêm vào giỏ hàng!');
+            console.log('Thêm vào giỏ hàng sản phẩm ID:', productId);
+        }
+    </script>
+</body>
+</html>
+
+

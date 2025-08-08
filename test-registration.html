@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Registration - LYN Salon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .result-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Chức Năng Đăng Ký - LYN Salon</h1>
+        
+        <div class="info">
+            <strong>Hướng dẫn:</strong> Sử dụng form bên dưới để test chức năng đăng ký và kiểm tra các trường hợp lỗi.
+        </div>
+
+        <!-- Test Registration Form -->
+        <div class="test-section">
+            <h3>📝 Form Đăng Ký Test</h3>
+            <form id="testRegisterForm">
+                <div class="form-group">
+                    <label for="testName">Họ tên</label>
+                    <input type="text" id="testName" name="name" value="Test User" required>
+                </div>
+                <div class="form-group">
+                    <label for="testEmail">Email</label>
+                    <input type="email" id="testEmail" name="email" value="test@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="testPhone">Số điện thoại</label>
+                    <input type="tel" id="testPhone" name="phone" value="0123456789" required>
+                </div>
+                <div class="form-group">
+                    <label for="testPassword">Mật khẩu</label>
+                    <input type="password" id="testPassword" name="password" value="123456" required>
+                </div>
+                <div class="form-group">
+                    <label for="testConfirmPassword">Xác nhận mật khẩu</label>
+                    <input type="password" id="testConfirmPassword" name="confirmPassword" value="123456" required>
+                </div>
+                <button type="submit" class="btn btn-success">Test Đăng Ký</button>
+            </form>
+        </div>
+
+        <!-- Test Cases -->
+        <div class="test-section">
+            <h3>🎭 Test Cases</h3>
+            <button class="btn" onclick="testValidRegistration()">Test Đăng Ký Hợp Lệ</button>
+            <button class="btn" onclick="testInvalidEmail()">Test Email Không Hợp Lệ</button>
+            <button class="btn" onclick="testShortPassword()">Test Mật Khẩu Ngắn</button>
+            <button class="btn" onclick="testPasswordMismatch()">Test Mật Khẩu Không Khớp</button>
+            <button class="btn" onclick="testEmptyFields()">Test Trường Trống</button>
+            <button class="btn btn-danger" onclick="clearResults()">Xóa Kết Quả</button>
+        </div>
+
+        <!-- Results Display -->
+        <div class="test-section">
+            <h3>📊 Kết Quả Test</h3>
+            <div id="testResults" class="result-display">
+                Nhấn các nút test để xem kết quả
+            </div>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="test-section">
+            <h3>🔍 Debug Information</h3>
+            <button class="btn" onclick="showDebugInfo()">Hiển thị thông tin debug</button>
+            <div id="debugInfo" class="result-display"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test functions
+        function testValidRegistration() {
+            const testData = {
+                name: 'Test User ' + Date.now(),
+                email: 'test' + Date.now() + '@example.com',
+                phone: '0123456789',
+                password: '123456',
+                confirmPassword: '123456'
+            };
+            
+            performRegistration(testData, 'Test đăng ký hợp lệ');
+        }
+
+        function testInvalidEmail() {
+            const testData = {
+                name: 'Test User',
+                email: 'invalid-email',
+                phone: '0123456789',
+                password: '123456',
+                confirmPassword: '123456'
+            };
+            
+            performRegistration(testData, 'Test email không hợp lệ');
+        }
+
+        function testShortPassword() {
+            const testData = {
+                name: 'Test User',
+                email: 'test@example.com',
+                phone: '0123456789',
+                password: '123',
+                confirmPassword: '123'
+            };
+            
+            performRegistration(testData, 'Test mật khẩu ngắn');
+        }
+
+        function testPasswordMismatch() {
+            const testData = {
+                name: 'Test User',
+                email: 'test@example.com',
+                phone: '0123456789',
+                password: '123456',
+                confirmPassword: '654321'
+            };
+            
+            performRegistration(testData, 'Test mật khẩu không khớp');
+        }
+
+        function testEmptyFields() {
+            const testData = {
+                name: '',
+                email: '',
+                phone: '',
+                password: '',
+                confirmPassword: ''
+            };
+            
+            performRegistration(testData, 'Test trường trống');
+        }
+
+        function performRegistration(data, testName) {
+            showMessage(`🔄 Đang thực hiện: ${testName}...`, 'info');
+            
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                const resultText = `
+=== ${testName} ===
+Status: ${result.success ? 'SUCCESS' : 'FAILED'}
+Message: ${result.message}
+Data: ${JSON.stringify(data, null, 2)}
+Response: ${JSON.stringify(result, null, 2)}
+                `;
+                
+                addResult(resultText);
+                
+                if (result.success) {
+                    showMessage(`✅ ${testName} thành công!`, 'success');
+                } else {
+                    showMessage(`❌ ${testName} thất bại: ${result.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                const errorText = `
+=== ${testName} ===
+Status: ERROR
+Error: ${error.message}
+Data: ${JSON.stringify(data, null, 2)}
+                `;
+                
+                addResult(errorText);
+                showMessage(`❌ ${testName} lỗi: ${error.message}`, 'error');
+            });
+        }
+
+        function addResult(text) {
+            const resultsDiv = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.textContent += `\n[${timestamp}] ${text}\n`;
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').textContent = 'Nhấn các nút test để xem kết quả';
+            showMessage('Đã xóa kết quả test', 'info');
+        }
+
+        function showDebugInfo() {
+            const debugInfo = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                localStorage: Object.keys(localStorage),
+                sessionStorage: Object.keys(sessionStorage),
+                cookies: document.cookie
+            };
+
+            document.getElementById('debugInfo').textContent = JSON.stringify(debugInfo, null, 2);
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = 
+                'position: fixed;' +
+                'top: 20px;' +
+                'right: 20px;' +
+                'padding: 15px 20px;' +
+                'border-radius: 8px;' +
+                'color: white;' +
+                'font-weight: 500;' +
+                'z-index: 3000;' +
+                'animation: slideIn 0.3s ease-out;';
+            
+            if (type === 'success') {
+                messageDiv.style.backgroundColor = '#28a745';
+            } else if (type === 'warning') {
+                messageDiv.style.backgroundColor = '#ffc107';
+                messageDiv.style.color = '#000';
+            } else if (type === 'error') {
+                messageDiv.style.backgroundColor = '#dc3545';
+            } else {
+                messageDiv.style.backgroundColor = '#17a2b8';
+            }
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // Handle form submission
+        document.getElementById('testRegisterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            performRegistration(data, 'Form Test');
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showMessage('Test page đã sẵn sàng!', 'success');
+        });
+
+        // Add slideIn animation
+        const style = document.createElement('style');
+        style.textContent = 
+            '@keyframes slideIn {' +
+            '    from {' +
+            '        opacity: 0;' +
+            '        transform: translateX(100%);' +
+            '    }' +
+            '    to {' +
+            '        opacity: 1;' +
+            '        transform: translateX(0);' +
+            '    }' +
+            '}';
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+
+

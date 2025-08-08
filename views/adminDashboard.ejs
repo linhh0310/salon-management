@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 0 20px 10px;
+            color: #bdc3c7;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item.active {
+            background: #34495e;
+            border-left-color: #3498db;
+            color: #3498db;
+        }
+
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item-arrow {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            background: #f4f6f8;
+        }
+
+        /* Top Navigation */
+        .admin-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .hamburger-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .header-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 30px;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .content-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .content-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.orange {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .stat-card.red {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .stat-card.purple {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
+        .stat-card.pink {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+        }
+
+        .stat-card.magenta {
+            background: linear-gradient(135deg, #ff5722, #e64a19);
+            color: white;
+        }
+
+        .stat-card.light-green {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .stat-details {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-details {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-details:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 3rem;
+            opacity: 0.1;
+        }
+
+        /* Footer */
+        .admin-footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Chat Section Styles */
+        .chat-section {
+            padding: 30px;
+        }
+
+        .admin-chat-container {
+            display: flex;
+            height: calc(100vh - 200px);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .chat-sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            overflow-y: auto;
+        }
+        
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .chat-list, .contact-list {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        .chat-item, .contact-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .chat-item:hover, .contact-item:hover {
+            background: #e9ecef;
+        }
+        
+        .chat-item.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .chat-item-header, .contact-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .chat-item-name, .contact-item-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .chat-item-time, .contact-item-time {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .chat-item-preview, .contact-item-preview {
+            font-size: 13px;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .unread-badge {
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .message.sent {
+            justify-content: flex-end;
+        }
+        
+        .message.received {
+            justify-content: flex-start;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        
+        .message.sent .message-content {
+            background: #007bff;
+            color: white;
+        }
+        
+        .message.received .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+        }
+        
+        .message-input:focus {
+            border-color: #007bff;
+        }
+        
+        .send-btn {
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .send-btn:hover {
+            background: #0056b3;
+        }
+        
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .no-chat-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+        }
+        
+        .no-chat-selected i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+        
+        .chat-info {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .chat-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        
+        .chat-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .chat-tabs {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: #e9ecef;
+        }
+        
+        .tab-btn.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+        
+        .contact-item.unread {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .contact-item-email {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .contact-detail {
+            padding: 20px;
+        }
+        
+        .contact-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .contact-header h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .contact-header p {
+            margin: 0 0 5px 0;
+            color: #666;
+        }
+        
+        .contact-header small {
+            color: #999;
+        }
+        
+        .contact-message {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .contact-message p {
+            margin: 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+            
+            .admin-chat-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .chat-sidebar {
+                width: 100%;
+                height: 300px;
+            }
+        }
+
+        /* Dark theme for cards */
+        .stat-card.dark {
+            background: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name">Admin</div>
+                <div class="profile-status">
+                    <i class="fas fa-circle"></i>
+                    Online
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">MENU ADMIN</div>
+                    <a href="/admin" class="menu-item active">
+                        <div class="menu-item-left">
+                            <i class="fas fa-home"></i>
+                            <span>Trang chủ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/appointments" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Lịch hẹn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/services" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cut"></i>
+                            <span>Dịch vụ</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/stylists" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Stylist</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/products" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Quản lý sản phẩm</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/orders" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Đơn hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/reviews" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-star"></i>
+                            <span>Đánh giá</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/customers" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-users"></i>
+                            <span>Khách hàng</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="#" class="menu-item" onclick="showChatSection()">
+                        <div class="menu-item-left">
+                            <i class="fas fa-comments"></i>
+                            <span>Tin nhắn & Chat</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/employees" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Nhân viên</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                    <a href="/admin/settings" class="menu-item">
+                        <div class="menu-item-left">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-item-arrow"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Navigation -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="hamburger-menu" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-title">Admin</div>
+                </div>
+                <div class="header-right">
+                    <a href="/" class="header-link">
+                        <i class="fas fa-eye"></i>
+                        Xem website
+                    </a>
+                    <div class="admin-user">
+                        <i class="fas fa-user"></i>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <div class="content-header">
+                    <h1 class="content-title">Tổng quan</h1>
+                    <p class="content-subtitle">Tổng quan</p>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card orange">
+                        <div class="stat-icon">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.totalAppointments %></div>
+                        <div class="stat-label">Tổng lịch hẹn</div>
+                        <div class="stat-details">
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stat-card green">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.pendingAppointments %></div>
+                        <div class="stat-label">Lịch hẹn chờ xác nhận</div>
+                        <div class="stat-details">
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stat-card blue">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.confirmedAppointments %></div>
+                        <div class="stat-label">Lịch hẹn đã xác nhận</div>
+                        <div class="stat-details">
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stat-card red">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.products %></div>
+                        <div class="stat-label">Sản phẩm salon</div>
+                        <div class="stat-details">
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stat-card purple">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.stylists %></div>
+                        <div class="stat-label">Stylist</div>
+                        <div class="stat-details">
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stat-card pink">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.totalReviews %></div>
+                        <div class="stat-label">Đánh giá khách hàng</div>
+                        <div class="stat-details">
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stat-card magenta">
+                        <div class="stat-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.unreadMessages %></div>
+                        <div class="stat-label">Tin nhắn chưa đọc</div>
+                        <div class="stat-details">
+                            <div style="margin-bottom: 10px;">
+                                <div style="font-size: 1.2rem; font-weight: 600;"><%= stats.users %></div>
+                                <div style="font-size: 0.9rem; opacity: 0.8;">Tổng khách hàng</div>
+                            </div>
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stat-card light-green">
+                        <div class="stat-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.categories %></div>
+                        <div class="stat-label">Danh mục dịch vụ</div>
+                        <div class="stat-details">
+                            <button class="btn-details">
+                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Section (Hidden by default) -->
+            <div id="chatSection" class="chat-section" style="display: none;">
+                <div class="content-header">
+                    <h1 class="content-title">Tin nhắn & Chat với khách hàng</h1>
+                    <p class="content-subtitle">Quản lý tin nhắn và chat real-time</p>
+                </div>
+                
+                <div class="admin-chat-container">
+                    <!-- Sidebar - Danh sách chat -->
+                    <div class="chat-sidebar">
+                        <div class="chat-info">
+                            <h3><i class="fas fa-comments"></i> Quản lý Tin nhắn & Chat</h3>
+                            <p>Tổng số cuộc hội thoại: <span id="totalChats">0</span></p>
+                            <p>Tin nhắn chưa đọc: <span id="unreadContacts">0</span></p>
+                        </div>
+                        
+                        <!-- Tab buttons -->
+                        <div class="chat-tabs">
+                            <button class="tab-btn active" onclick="switchTab('chat')">
+                                <i class="fas fa-comments"></i> Chat
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('contact')">
+                                <i class="fas fa-envelope"></i> Tin nhắn
+                            </button>
+                        </div>
+                        
+                        <!-- Chat list -->
+                        <ul class="chat-list" id="chatList">
+                            <!-- Chat items sẽ được thêm ở đây -->
+                        </ul>
+                        
+                        <!-- Contact list -->
+                        <ul class="contact-list" id="contactList" style="display: none;">
+                            <!-- Contact items sẽ được thêm ở đây -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Main chat area -->
+                    <div class="chat-main">
+                        <div class="chat-header">
+                            <h1><i class="fas fa-headset"></i> Tin nhắn & Chat với khách hàng</h1>
+                            <div class="chat-status">
+                                <div class="status-indicator"></div>
+                                <span>Trực tuyến</span>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="no-chat-selected" id="noChatSelected">
+                                <i class="fas fa-comments"></i>
+                                <h3>Chọn cuộc hội thoại</h3>
+                                <p>Chọn một cuộc hội thoại từ danh sách bên trái để bắt đầu chat</p>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input">
+                            <div class="input-group">
+                                <input type="text" class="message-input" id="messageInput" placeholder="Nhập tin nhắn..." maxlength="500">
+                                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="admin-footer">
+                <div>Copyright © 2014-2015 SÀI GÒN WEB</div>
+                <div>Version 1.0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Add mobile menu button
+        if (window.innerWidth <= 768) {
+            const header = document.querySelector('.admin-header');
+            const toggleBtn = document.createElement('button');
+            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            toggleBtn.style.cssText = 'background: none; border: none; font-size: 18px; color: white; cursor: pointer;';
+            toggleBtn.onclick = toggleSidebar;
+            header.insertBefore(toggleBtn, header.firstChild);
+        }
+
+        // Handle detail buttons
+        document.querySelectorAll('.btn-details').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.stat-card');
+                const label = card.querySelector('.stat-label').textContent;
+                alert('Xem chi tiết: ' + label);
+            });
+        });
+
+        // Chat variables
+        let currentChatId = null;
+        let currentChatType = null;
+        let chats = [];
+        let contacts = [];
+        let currentTab = 'chat';
+
+        // Show chat section
+        function showChatSection() {
+            // Hide dashboard content
+            document.querySelector('.admin-content').style.display = 'none';
+            // Show chat section
+            document.getElementById('chatSection').style.display = 'block';
+            
+            // Load chat data
+            loadChats();
+            loadContacts();
+            
+            // Auto refresh
+            setInterval(loadChats, 5000);
+        }
+
+        // Load chats
+        async function loadChats() {
+            try {
+                const response = await fetch('/chat/chats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    chats = data.chats;
+                    displayChats(chats);
+                    document.getElementById('totalChats').textContent = chats.length;
+                }
+            } catch (error) {
+                console.error('Error loading chats:', error);
+            }
+        }
+
+        // Load contacts
+        async function loadContacts() {
+            try {
+                const response = await fetch('/chat/contacts');
+                const data = await response.json();
+                
+                if (data.success) {
+                    contacts = data.contacts;
+                    displayContacts(contacts);
+                    document.getElementById('unreadContacts').textContent = data.unreadCount || 0;
+                }
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+            }
+        }
+
+        // Display chats
+        function displayChats(chats) {
+            const chatList = document.getElementById('chatList');
+            chatList.innerHTML = '';
+            
+            if (chats.length === 0) {
+                chatList.innerHTML = '<li style="padding: 20px; text-align: center; color: #666;">Chưa có cuộc hội thoại nào</li>';
+                return;
+            }
+            
+            chats.forEach(chat => {
+                const chatItem = document.createElement('li');
+                chatItem.className = 'chat-item';
+                chatItem.onclick = () => selectChat(chat.other_user_id, chat.other_user_type);
+                
+                const isActive = currentChatId === chat.other_user_id && currentChatType === chat.other_user_type;
+                if (isActive) {
+                    chatItem.classList.add('active');
+                }
+                
+                const unreadBadge = chat.unread_count > 0 ? 
+                    `<span class="unread-badge">${chat.unread_count}</span>` : '';
+                
+                chatItem.innerHTML = `
+                    <div class="chat-item-header">
+                        <span class="chat-item-name">Khách hàng #${chat.other_user_id}</span>
+                        ${unreadBadge}
+                    </div>
+                    <div class="chat-item-time">${formatTime(chat.last_message_time)}</div>
+                    <div class="chat-item-preview">${chat.last_message || 'Chưa có tin nhắn'}</div>
+                `;
+                
+                chatList.appendChild(chatItem);
+            });
+        }
+
+        // Display contacts
+        function displayContacts(contacts) {
+            const contactList = document.getElementById('contactList');
+            contactList.innerHTML = '';
+            
+            if (contacts.length === 0) {
+                contactList.innerHTML = '<li style="padding: 20px; text-align: center; color: #666;">Chưa có tin nhắn nào</li>';
+                return;
+            }
+            
+            contacts.forEach(contact => {
+                const contactItem = document.createElement('li');
+                contactItem.className = `contact-item ${!contact.is_read ? 'unread' : ''}`;
+                contactItem.onclick = () => selectContact(contact);
+                
+                contactItem.innerHTML = `
+                    <div class="contact-item-header">
+                        <span class="contact-item-name">${contact.name}</span>
+                        <span class="contact-item-email">${contact.email}</span>
+                    </div>
+                    <div class="contact-item-preview">${contact.message.substring(0, 50)}${contact.message.length > 50 ? '...' : ''}</div>
+                    <div class="contact-item-time">${formatTime(contact.created_at)}</div>
+                `;
+                
+                contactList.appendChild(contactItem);
+            });
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide lists
+            if (tab === 'chat') {
+                document.getElementById('chatList').style.display = 'block';
+                document.getElementById('contactList').style.display = 'none';
+            } else {
+                document.getElementById('chatList').style.display = 'none';
+                document.getElementById('contactList').style.display = 'block';
+            }
+            
+            // Clear chat area
+            document.getElementById('noChatSelected').style.display = 'block';
+            currentChatId = null;
+            currentChatType = null;
+        }
+
+        // Select chat
+        function selectChat(userId, userType) {
+            currentChatId = userId;
+            currentChatType = userType;
+            
+            // Update active state
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.chat-item').classList.add('active');
+            
+            // Load messages
+            loadMessages();
+            
+            // Hide no-chat-selected
+            document.getElementById('noChatSelected').style.display = 'none';
+        }
+
+        // Select contact
+        function selectContact(contact) {
+            // Mark as read
+            if (!contact.is_read) {
+                fetch(`/chat/contact/${contact.id}/read`, {
+                    method: 'PUT'
+                }).then(() => {
+                    contact.is_read = true;
+                    displayContacts(contacts);
+                });
+            }
+            
+            // Display contact message
+            const chatMessages = document.getElementById('chatMessages');
+            document.getElementById('noChatSelected').style.display = 'none';
+            
+            chatMessages.innerHTML = `
+                <div class="contact-detail">
+                    <div class="contact-header">
+                        <h3>${contact.name}</h3>
+                        <p>${contact.email} | ${contact.phone || 'Không có số điện thoại'}</p>
+                        <small>${formatTime(contact.created_at)}</small>
+                    </div>
+                    <div class="contact-message">
+                        <p>${contact.message}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load messages
+        async function loadMessages() {
+            if (!currentChatId || !currentChatType) return;
+            
+            try {
+                const response = await fetch(`/chat/messages/${currentChatId}/${currentChatType}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayMessages(data.messages);
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        // Display messages
+        function displayMessages(messages) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (messages.length === 0) {
+                chatMessages.innerHTML = `
+                    <div class="no-chat-selected">
+                        <i class="fas fa-comments"></i>
+                        <h3>Chưa có tin nhắn nào</h3>
+                        <p>Bắt đầu cuộc trò chuyện với khách hàng</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            chatMessages.innerHTML = '';
+            
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.sender_type === 'admin' ? 'sent' : 'received'}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = message.message;
+                
+                const messageTime = document.createElement('div');
+                messageTime.className = 'message-time';
+                messageTime.textContent = new Date(message.created_at).toLocaleTimeString('vi-VN');
+                
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(messageTime);
+                chatMessages.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentChatId || !currentChatType) return;
+            
+            try {
+                const response = await fetch('/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        receiver_id: currentChatId,
+                        receiver_type: currentChatType,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    input.value = '';
+                    loadMessages();
+                    loadChats();
+                } else {
+                    alert('Có lỗi xảy ra khi gửi tin nhắn: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi gửi tin nhắn');
+            }
+        }
+
+        // Send message on Enter
+        document.addEventListener('keypress', function(e) {
+            if (e.target.id === 'messageInput' && e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Format time
+        function formatTime(timestamp) {
+            if (!timestamp) return '';
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) {
+                return 'Vừa xong';
+            } else if (diff < 3600000) {
+                return Math.floor(diff / 60000) + ' phút trước';
+            } else if (diff < 86400000) {
+                return Math.floor(diff / 3600000) + ' giờ trước';
+            } else {
+                return date.toLocaleDateString('vi-VN');
+            }
+        }
+    </script>
+</body>
+</html>
