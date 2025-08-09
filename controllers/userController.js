@@ -3,6 +3,7 @@ const Appointment = require('../models/appointmentModel');
 const Service = require('../models/serviceModel');
 const Stylist = require('../models/stylistModel');
 const { validationResult } = require('express-validator');
+const db = require('../config/db');
 
 class UserController {
   // Hiển thị trang chủ
@@ -326,11 +327,17 @@ class UserController {
       const appointments = await Appointment.findByUserId(req.session.user.id);
       console.log('📋 Appointments found:', appointments.length);
       
+      // Lấy đơn hàng của user từ MySQL
+      const Order = require('../models/orderModel');
+      const orders = await Order.findByUserId(req.session.user.id);
+      console.log('📦 Orders found:', orders.length);
+      
       console.log('🎨 Rendering userDashboard...');
       res.render('userDashboard', {
         title: 'Dashboard',
         user: req.session.user,
-        appointments
+        appointments,
+        orders
       });
       console.log('✅ Dashboard rendered successfully');
     } catch (error) {
@@ -339,6 +346,190 @@ class UserController {
         message: 'Có lỗi xảy ra khi tải dashboard',
         error: error 
       });
+    }
+  }
+
+  // Đổi mật khẩu
+  static async changePassword(req, res) {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.session.user.id;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Vui lòng nhập đầy đủ thông tin'
+        });
+      }
+
+      // Lấy thông tin user hiện tại (bao gồm password)
+      const [userRows] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
+      const user = userRows[0];
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy người dùng'
+        });
+      }
+
+      // Kiểm tra mật khẩu hiện tại
+      const bcrypt = require('bcryptjs');
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({
+          success: false,
+          message: 'Mật khẩu hiện tại không đúng'
+        });
+      }
+
+      // Hash mật khẩu mới
+      const saltRounds = 10;
+      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+      // Cập nhật mật khẩu trong database
+      await User.changePassword(userId, newPassword);
+
+      res.json({
+        success: true,
+        message: 'Đổi mật khẩu thành công'
+      });
+
+    } catch (error) {
+      console.error('❌ Error in changePassword:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra khi đổi mật khẩu'
+      });
+    }
+  }
+
+  // Xem chi tiết đơn hàng
+  static async getOrderDetail(req, res) {
+    try {
+      const orderId = req.params.id;
+      const userId = req.session.user.id;
+
+      const Order = require('../models/orderModel');
+      const order = await Order.findById(orderId);
+
+      if (!order) {
+        return res.status(404).render('error', {
+          message: 'Không tìm thấy đơn hàng',
+          error: { status: 404 }
+        });
+      }
+
+      // Kiểm tra xem đơn hàng có thuộc về user hiện tại không
+      if (order.user_id != userId) {
+        return res.status(403).render('error', {
+          message: 'Bạn không có quyền xem đơn hàng này',
+          error: { status: 403 }
+        });
+      }
+
+      // Lấy chi tiết sản phẩm trong đơn hàng
+      const db = require('../config/db');
+      const [orderItems] = await db.execute(`
+        SELECT oi.*, p.name as product_name
+        FROM order_items oi
+        LEFT JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+      `, [orderId]);
+
+      // Kiểm tra nếu request là AJAX (từ modal)
+      if (req.xhr || req.headers.accept && req.headers.accept.indexOf('json') > -1) {
+        return res.json({
+          success: true,
+          order,
+          orderItems
+        });
+      }
+
+      // Render trang đầy đủ nếu không phải AJAX
+      res.render('orderDetail', {
+        title: 'Chi tiết đơn hàng',
+        user: req.session.user,
+        order,
+        orderItems
+      });
+
+    } catch (error) {
+      console.error('❌ Error in getOrderDetail:', error);
+      
+      if (req.xhr || req.headers.accept && req.headers.accept.indexOf('json') > -1) {
+        return res.status(500).json({
+          success: false,
+          message: 'Có lỗi xảy ra khi tải chi tiết đơn hàng'
+        });
+      }
+      
+      res.status(500).render('error', {
+        message: 'Có lỗi xảy ra khi tải chi tiết đơn hàng',
+        error: error
+      });
+    }
+  }
+
+  // Đặt hàng từ giỏ hàng
+  static async placeOrder(req, res) {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập để đặt hàng' });
+      }
+
+      const { 
+        cartItems, 
+        shippingAddress, 
+        province,
+        district,
+        ward,
+        fullName,
+        phone,
+        email,
+        paymentMethod, 
+        notes 
+      } = req.body;
+      
+      if (!cartItems || cartItems.length === 0) {
+        return res.status(400).json({ success: false, message: 'Giỏ hàng trống' });
+      }
+
+      // Tính tổng tiền
+      const totalAmount = cartItems.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+      }, 0);
+
+      const Order = require('../models/orderModel');
+      
+      // Tạo đơn hàng với thông tin địa chỉ chi tiết
+      const orderData = {
+        user_id: req.session.user.id,
+        total_amount: totalAmount,
+        shipping_address: shippingAddress,
+        province: province,
+        district: district,
+        ward: ward,
+        full_name: fullName,
+        phone: phone,
+        email: email,
+        payment_method: paymentMethod,
+        notes: notes
+      };
+
+      const orderId = await Order.create(orderData);
+      
+      // Tạo order_items
+      await Order.createOrderItems(orderId, cartItems);
+
+      res.json({ 
+        success: true, 
+        message: 'Đặt hàng thành công!',
+        orderId: orderId
+      });
+    } catch (error) {
+      console.error('Error in placeOrder:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi đặt hàng' });
     }
   }
 
@@ -414,7 +605,7 @@ class UserController {
       }
 
       // Tạo lịch hẹn
-      await Appointment.create({
+      const appointmentId = await Appointment.create({
         user_id: req.session.user.id,
         service_id,
         stylist_id,
@@ -423,8 +614,30 @@ class UserController {
         notes
       });
 
+      // Lấy thông tin chi tiết để hiển thị
+      const appointment = await Appointment.findById(appointmentId);
+      const service = await Service.findById(service_id);
+      const stylist = await Stylist.findById(stylist_id);
+
+      // Trả về JSON response cho AJAX
+      if (req.headers['content-type'] && req.headers['content-type'].includes('application/json')) {
+        return res.json({
+          success: true,
+          message: 'Đặt lịch hẹn thành công!',
+          appointment: {
+            id: appointmentId,
+            service_name: service.name,
+            service_price: service.price,
+            stylist_name: stylist.name,
+            appointment_date: appointment_date,
+            appointment_time: appointment_time,
+            notes: notes
+          }
+        });
+      }
+
       req.flash('success', 'Đặt lịch hẹn thành công!');
-      res.redirect('/dashboard');
+      res.redirect('/');
     } catch (error) {
       console.error('Error in postBookAppointment:', error);
       res.status(500).render('error', { 
@@ -434,11 +647,94 @@ class UserController {
     }
   }
 
+  // Xem chi tiết lịch hẹn
+  static async getAppointmentDetail(req, res) {
+    try {
+      console.log('🔍 getAppointmentDetail called');
+      console.log('📋 Params:', req.params);
+      console.log('👤 User ID:', req.session.user.id);
+      
+      const appointmentId = req.params.id;
+      const userId = req.session.user.id;
+
+      console.log('🔍 Fetching appointment ID:', appointmentId);
+      
+      // Sử dụng query trực tiếp để đảm bảo lấy đủ thông tin
+      const db = require('../config/db');
+      const [appointmentRows] = await db.execute(`
+        SELECT a.*, s.name as service_name, s.price as service_price,
+               st.name as stylist_name, u.name as customer_name
+        FROM appointments a
+        LEFT JOIN services s ON a.service_id = s.id
+        LEFT JOIN stylists st ON a.stylist_id = st.id
+        LEFT JOIN users u ON a.user_id = u.id
+        WHERE a.id = ?
+      `, [appointmentId]);
+      
+      const appointment = appointmentRows[0];
+      console.log('📋 Appointment data:', appointment);
+
+      if (!appointment) {
+        console.log('❌ Appointment not found');
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy lịch hẹn'
+        });
+      }
+
+      // Kiểm tra xem lịch hẹn có thuộc về user hiện tại không
+      if (appointment.user_id != userId) {
+        console.log('❌ User not authorized. Appointment user_id:', appointment.user_id, 'Current user_id:', userId);
+        return res.status(403).json({
+          success: false,
+          message: 'Bạn không có quyền xem lịch hẹn này'
+        });
+      }
+
+      console.log('✅ Authorization passed');
+
+      // Kiểm tra nếu request là AJAX
+      if (req.xhr || req.headers.accept && req.headers.accept.indexOf('json') > -1) {
+        console.log('📤 Returning JSON response');
+        return res.json({
+          success: true,
+          appointment
+        });
+      }
+
+      // Render trang đầy đủ nếu không phải AJAX
+      console.log('📤 Rendering full page');
+      res.render('appointmentDetail', {
+        title: 'Chi tiết lịch hẹn',
+        user: req.session.user,
+        appointment
+      });
+
+    } catch (error) {
+      console.error('❌ Error in getAppointmentDetail:', error);
+      
+      if (req.xhr || req.headers.accept && req.headers.accept.indexOf('json') > -1) {
+        return res.status(500).json({
+          success: false,
+          message: 'Có lỗi xảy ra khi tải chi tiết lịch hẹn'
+        });
+      }
+      
+      res.status(500).render('error', {
+        message: 'Có lỗi xảy ra khi tải chi tiết lịch hẹn',
+        error: error
+      });
+    }
+  }
+
   // Hủy lịch hẹn
   static async cancelAppointment(req, res) {
     try {
       if (!req.session.user) {
-        return res.redirect('/login');
+        return res.status(401).json({
+          success: false,
+          message: 'Vui lòng đăng nhập'
+        });
       }
 
       const { id } = req.params;
@@ -446,18 +742,98 @@ class UserController {
       // Kiểm tra lịch hẹn thuộc về user
       const appointment = await Appointment.findById(id);
       if (!appointment || appointment.user_id != req.session.user.id) {
-        req.flash('error', 'Không tìm thấy lịch hẹn');
-        return res.redirect('/dashboard');
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy lịch hẹn'
+        });
+      }
+
+      // Kiểm tra trạng thái hiện tại
+      if (appointment.status === 'cancelled') {
+        return res.status(400).json({
+          success: false,
+          message: 'Lịch hẹn đã được hủy trước đó'
+        });
+      }
+
+      if (appointment.status === 'completed') {
+        return res.status(400).json({
+          success: false,
+          message: 'Không thể hủy lịch hẹn đã hoàn thành'
+        });
       }
 
       await Appointment.updateStatus(id, 'cancelled');
       
-      req.flash('success', 'Hủy lịch hẹn thành công!');
-      res.redirect('/dashboard');
+      res.json({
+        success: true,
+        message: 'Hủy lịch hẹn thành công!'
+      });
     } catch (error) {
       console.error('Error in cancelAppointment:', error);
-      req.flash('error', 'Có lỗi xảy ra khi hủy lịch hẹn');
-      res.redirect('/dashboard');
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra khi hủy lịch hẹn'
+      });
+    }
+  }
+
+  // Đánh giá lịch hẹn
+  static async rateAppointment(req, res) {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Vui lòng đăng nhập'
+        });
+      }
+
+      const { id } = req.params;
+      const { rating, comment } = req.body;
+      
+      // Kiểm tra dữ liệu đầu vào
+      if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({
+          success: false,
+          message: 'Đánh giá phải từ 1-5 sao'
+        });
+      }
+
+      // Kiểm tra lịch hẹn thuộc về user
+      const appointment = await Appointment.findById(id);
+      if (!appointment || appointment.user_id != req.session.user.id) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy lịch hẹn'
+        });
+      }
+
+      // Kiểm tra trạng thái lịch hẹn
+      if (appointment.status !== 'completed') {
+        return res.status(400).json({
+          success: false,
+          message: 'Chỉ có thể đánh giá lịch hẹn đã hoàn thành'
+        });
+      }
+
+      // Lưu đánh giá vào database
+      const db = require('../config/db');
+      await db.execute(`
+        INSERT INTO reviews (user_id, appointment_id, rating, comment, created_at)
+        VALUES (?, ?, ?, ?, NOW())
+        ON DUPLICATE KEY UPDATE rating = ?, comment = ?, updated_at = NOW()
+      `, [req.session.user.id, id, rating, comment, rating, comment]);
+
+      res.json({
+        success: true,
+        message: 'Đánh giá thành công!'
+      });
+    } catch (error) {
+      console.error('Error in rateAppointment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Có lỗi xảy ra khi đánh giá'
+      });
     }
   }
 

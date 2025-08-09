@@ -393,18 +393,24 @@
                         
                         <div class="form-group">
                             <label for="province">Tỉnh/thành phố</label>
-                            <select id="province" name="province" required>
+                            <select id="province" name="province" required onchange="loadDistricts()">
                                 <option value="">Chọn tỉnh/thành phố</option>
-                                <option value="hanoi">Hà Nội</option>
-                                <option value="hcm">TP. Hồ Chí Minh</option>
-                                <option value="danang">Đà Nẵng</option>
-                                <option value="haiphong">Hải Phòng</option>
+                                <option value="Đà Nẵng">Đà Nẵng</option>
+                                <option value="Hà Nội">Hà Nội</option>
+                                <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                                <option value="Hải Phòng">Hải Phòng</option>
+                                <option value="Cần Thơ">Cần Thơ</option>
+                                <option value="Đà Lạt">Đà Lạt</option>
+                                <option value="Nha Trang">Nha Trang</option>
+                                <option value="Huế">Huế</option>
+                                <option value="Vũng Tàu">Vũng Tàu</option>
+                                <option value="Qui Nhơn">Qui Nhơn</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label for="district">Quận/huyện</label>
-                            <select id="district" name="district" required>
+                            <select id="district" name="district" required onchange="loadWards()">
                                 <option value="">Chọn quận/huyện</option>
                             </select>
                         </div>
@@ -491,7 +497,7 @@
                         '<td>' +
                             '<div class="product-details">' +
                                 '<h4>' + item.name + '</h4>' +
-                                '<div class="product-price">' + item.price.toLocaleString('vi-VN') + ' VNĐ</div>' +
+                                '<div class="product-price">₫ ' + item.price.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, '.') + '</div>' +
                             '</div>' +
                         '</td>' +
                         '<td>' +
@@ -503,7 +509,7 @@
                             '</div>' +
                         '</td>' +
                         '<td>' +
-                            '<div class="subtotal">' + itemTotal.toLocaleString('vi-VN') + ' VNĐ</div>' +
+                            '<div class="subtotal">₫ ' + itemTotal.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, '.') + '</div>' +
                         '</td>' +
                         '<td>' +
                             '<button class="remove-btn" onclick="removeFromCart(' + item.id + ')">' +
@@ -572,6 +578,67 @@
             updateHeaderCartCount();
         }
         
+        // Dữ liệu quận/huyện và phường/xã
+        const addressData = {
+            'Đà Nẵng': {
+                'Hải Châu': ['Phước Ninh', 'Thạch Thang', 'Nam Dương', 'Bình Hiên', 'Bình Thuận', 'Hòa Cường Bắc', 'Hòa Cường Nam'],
+                'Thanh Khê': ['An Khê', 'Chính Gián', 'Hòa Khê', 'Tam Thuận', 'Tân Chính', 'Thạc Gián', 'Vĩnh Trung'],
+                'Sơn Trà': ['An Hải Bắc', 'An Hải Đông', 'An Hải Nam', 'An Hải Tây', 'Mân Thái', 'Nại Hiên Đông', 'Phước Mỹ', 'Thọ Quang'],
+                'Ngũ Hành Sơn': ['Hòa Hải', 'Hòa Quý', 'Khuê Mỹ', 'Mỹ An'],
+                'Liên Chiểu': ['Hòa Hiệp Bắc', 'Hòa Hiệp Nam', 'Hòa Khánh Bắc', 'Hòa Khánh Nam', 'Hòa Minh', 'Hòa Phát', 'Hòa Thọ Đông', 'Hòa Thọ Tây'],
+                'Cẩm Lệ': ['Hòa An', 'Hòa Phát', 'Hòa Thọ Đông', 'Hòa Thọ Tây', 'Khuê Trung', 'Nam Thọ', 'Phước Ninh']
+            },
+            'Hà Nội': {
+                'Ba Đình': ['Phúc Xá', 'Trúc Bạch', 'Vĩnh Phúc', 'Cống Vị', 'Liễu Giai', 'Nguyễn Trung Trực', 'Quán Thánh', 'Ngọc Hà', 'Điện Biên', 'Đội Cấn', 'Ngọc Khánh', 'Kim Mã', 'Giảng Võ', 'Thành Công'],
+                'Hoàn Kiếm': ['Phúc Tân', 'Đồng Xuân', 'Hàng Mã', 'Hàng Vôi', 'Hàng Gai', 'Hàng Trống', 'Hàng Bông', 'Hàng Bồ', 'Hàng Bạc', 'Hàng Buồm', 'Hàng Đào', 'Hàng Ngang', 'Hàng Nón', 'Cầu Đông', 'Lý Thái Tổ', 'Hàng Bút', 'Hàng Than', 'Hàng Giấy', 'Hàng Lược', 'Chương Dương', 'Hàng Vải', 'Cửa Đông', 'Lý Thường Kiệt', 'Phan Chu Trinh', 'Hàng Bài'],
+                'Hai Bà Trưng': ['Phạm Đình Hổ', 'Lê Đại Hành', 'Đồng Nhân', 'Phố Huế', 'Đống Mác', 'Thanh Lương', 'Thanh Nhàn', 'Cầu Dền', 'Bách Khoa', 'Đồng Tâm', 'Quỳnh Lôi', 'Quỳnh Mai', 'Minh Khai', 'Đồng Tâm', 'Trương Định', 'Tân Mai', 'Hoàng Văn Thụ', 'Giáp Bát', 'Vĩnh Tuy', 'Bạch Mai', 'Quỳnh Lôi', 'Lương Yên', 'Vĩnh Hưng', 'Thanh Trì', 'Vĩnh Hưng', 'Định Công', 'Mai Động', 'Tương Mai', 'Đại Kim', 'Hoàng Liệt', 'Lĩnh Nam', 'Vĩnh Hưng', 'Định Công', 'Mai Động', 'Tương Mai', 'Đại Kim', 'Hoàng Liệt', 'Lĩnh Nam', 'Vĩnh Hưng', 'Định Công', 'Mai Động', 'Tương Mai', 'Đại Kim', 'Hoàng Liệt', 'Lĩnh Nam']
+            },
+            'TP. Hồ Chí Minh': {
+                'Quận 1': ['Bến Nghé', 'Bến Thành', 'Cầu Kho', 'Cầu Ông Lãnh', 'Cô Giang', 'Đa Kao', 'Nguyễn Cư Trinh', 'Nguyễn Thái Bình', 'Phạm Ngũ Lão', 'Tân Định'],
+                'Quận 2': ['An Khánh', 'An Lợi Đông', 'An Phú', 'Bình An', 'Bình Khánh', 'Bình Trưng Đông', 'Bình Trưng Tây', 'Cát Lái', 'Thạnh Mỹ Lợi', 'Thảo Điền', 'Thủ Thiêm'],
+                'Quận 3': ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14']
+            }
+        };
+
+        function loadDistricts() {
+            const province = document.getElementById('province').value;
+            const districtSelect = document.getElementById('district');
+            const wardSelect = document.getElementById('ward');
+            
+            // Reset district và ward
+            districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            
+            if (province && addressData[province]) {
+                const districts = Object.keys(addressData[province]);
+                districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        }
+
+        function loadWards() {
+            const province = document.getElementById('province').value;
+            const district = document.getElementById('district').value;
+            const wardSelect = document.getElementById('ward');
+            
+            // Reset ward
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            
+            if (province && district && addressData[province] && addressData[province][district]) {
+                const wards = addressData[province][district];
+                wards.forEach(ward => {
+                    const option = document.createElement('option');
+                    option.value = ward;
+                    option.textContent = ward;
+                    wardSelect.appendChild(option);
+                });
+            }
+        }
+
         function processCheckout() {
             var cart = JSON.parse(localStorage.getItem('cart')) || [];
             if (cart.length === 0) {
@@ -589,26 +656,70 @@
             var deliveryInfo = Object.fromEntries(formData);
             var paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
             
+            // Chuẩn bị dữ liệu đơn hàng
+            var cartItems = cart.map(function(item) {
+                return {
+                    product_id: item.id,
+                    quantity: item.quantity,
+                    price: item.price
+                };
+            });
+            
+            // Tạo địa chỉ đầy đủ
+            var fullAddress = deliveryInfo.address;
+            if (deliveryInfo.ward) {
+                fullAddress = deliveryInfo.ward + ', ' + deliveryInfo.district + ', ' + deliveryInfo.province;
+                if (deliveryInfo.address) {
+                    fullAddress = deliveryInfo.address + ', ' + fullAddress;
+                }
+            }
+            
             var orderData = {
-                items: cart,
-                delivery: deliveryInfo,
-                payment: paymentMethod,
-                total: cart.reduce(function(total, item) { return total + (item.price * item.quantity); }, 0)
+                cartItems: cartItems,
+                shippingAddress: fullAddress,
+                province: deliveryInfo.province,
+                district: deliveryInfo.district,
+                ward: deliveryInfo.ward,
+                fullName: deliveryInfo.fullName,
+                phone: deliveryInfo.phone,
+                email: deliveryInfo.email,
+                paymentMethod: paymentMethod,
+                notes: deliveryInfo.notes || ''
             };
             
-            // Here you would typically send the order to your backend
-            console.log('Order data:', orderData);
-            
-            // For now, just show success message and clear cart
-            alert('Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại LYN Salon.');
-            localStorage.removeItem('cart');
-            loadCartItems();
-            updateHeaderCartCount();
-            
-            // Redirect to dashboard
-            setTimeout(function() {
-                window.location.href = '/';
-            }, 2000);
+            // Gửi đơn hàng đến server
+            fetch('/orders/place', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại LYN Salon.');
+                    localStorage.removeItem('cart');
+                    // Xóa giỏ hàng của user hiện tại
+                    var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                    if (currentUser.id) {
+                        localStorage.removeItem('userCart_' + currentUser.id);
+                    }
+                    loadCartItems();
+                    updateHeaderCartCount();
+                    
+                    // Redirect to dashboard
+                    setTimeout(function() {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại!');
+            });
         }
         
         function updateHeaderCartCount() {

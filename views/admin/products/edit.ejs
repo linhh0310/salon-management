@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa Sản phẩm - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .features-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .feature-tag {
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .feature-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .current-image {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h1><i class="fas fa-edit"></i> Sửa Sản phẩm</h1>
+            <p>Cập nhật thông tin sản phẩm</p>
+        </div>
+
+        <form method="POST" action="/admin/products/<%= product.id %>/edit" enctype="multipart/form-data">
+            <input type="hidden" name="current_image" value="<%= product.image_url %>">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Tên sản phẩm *</label>
+                    <input type="text" id="name" name="name" value="<%= product.name %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Danh mục *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Chọn danh mục</option>
+                        <option value="Sản phẩm tóc" <%= product.category === 'Sản phẩm tóc' ? 'selected' : '' %>>Sản phẩm tóc</option>
+                        <option value="Sản phẩm chăm sóc da" <%= product.category === 'Sản phẩm chăm sóc da' ? 'selected' : '' %>>Sản phẩm chăm sóc da</option>
+                        <option value="Dụng cụ làm đẹp" <%= product.category === 'Dụng cụ làm đẹp' ? 'selected' : '' %>>Dụng cụ làm đẹp</option>
+                        <option value="Sản phẩm khác" <%= product.category === 'Sản phẩm khác' ? 'selected' : '' %>>Sản phẩm khác</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Mô tả sản phẩm</label>
+                <textarea id="description" name="description" rows="4" placeholder="Mô tả chi tiết về sản phẩm..."><%= product.description || '' %></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">Giá (VNĐ) *</label>
+                    <input type="number" id="price" name="price" min="0" step="1000" value="<%= product.price %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Số lượng tồn kho *</label>
+                    <input type="number" id="quantity" name="quantity" min="0" value="<%= product.quantity %>" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Hình ảnh sản phẩm</label>
+                <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(this)">
+                <% if (product.image_url) { %>
+                    <div class="current-image">
+                        <p><strong>Hình ảnh hiện tại:</strong></p>
+                        <img src="<%= product.image_url %>" alt="<%= product.name %>" class="image-preview">
+                    </div>
+                <% } %>
+                <img id="imagePreview" class="image-preview" style="display: none;">
+            </div>
+
+            <div class="form-group">
+                <label for="features">Tính năng sản phẩm</label>
+                <input type="text" id="features" placeholder="Nhập tính năng và nhấn Enter để thêm">
+                <div id="featuresList" class="features-input"></div>
+                <input type="hidden" id="featuresInput" name="features">
+            </div>
+
+            <div class="form-actions">
+                <a href="/admin/products" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Cập nhật sản phẩm
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Load existing features
+        let features = [];
+        <% if (product.features) { %>
+            try {
+                const parsedFeatures = JSON.parse('<%= product.features %>');
+                if (Array.isArray(parsedFeatures)) {
+                    features = parsedFeatures;
+                }
+            } catch (e) {
+                console.log('Error parsing features:', e);
+            }
+        <% } %>
+        
+        // Initialize features display
+        updateFeaturesDisplay();
+
+        // Preview image
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Features management
+        const featuresInput = document.getElementById('features');
+        const featuresList = document.getElementById('featuresList');
+        const featuresHidden = document.getElementById('featuresInput');
+
+        featuresInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const feature = this.value.trim();
+                if (feature && !features.includes(feature)) {
+                    features.push(feature);
+                    updateFeaturesDisplay();
+                    this.value = '';
+                }
+            }
+        });
+
+        function updateFeaturesDisplay() {
+            featuresList.innerHTML = '';
+            features.forEach((feature, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'feature-tag';
+                tag.innerHTML = `
+                    ${feature}
+                    <span class="remove" onclick="removeFeature(${index})">&times;</span>
+                `;
+                featuresList.appendChild(tag);
+            });
+            featuresHidden.value = features.join(',');
+        }
+
+        function removeFeature(index) {
+            features.splice(index, 1);
+            updateFeaturesDisplay();
+        }
+    </script>
+</body>
+</html>
+

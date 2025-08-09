@@ -61,12 +61,16 @@ app.use(session({
 // Flash messages
 app.use(flash());
 
+// Import price helper
+const { formatPrice } = require('./utils/priceHelper');
+
 // Global variables for templates
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success');
   res.locals.error_msg = req.flash('error');
   res.locals.user = req.session.user || null;
   res.locals.currentUser = req.session.user || null;
+  res.locals.formatPrice = formatPrice; // Make formatPrice available in all templates
   next();
 });
 

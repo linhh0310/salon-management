@@ -5,6 +5,7 @@ const Stylist = require('../models/stylistModel');
 const Category = require('../models/categoryModel');
 const Employee = require('../models/employeeModel');
 const { validationResult } = require('express-validator');
+const db = require('../config/db');
 
 class AdminController {
   // Hiển thị dashboard admin
@@ -535,6 +536,150 @@ class AdminController {
     }
   }
 
+  // Hiển thị form thêm sản phẩm
+  static getAddProduct(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      res.render('admin/products/add', {
+        title: 'Thêm Sản phẩm',
+        user: req.session.user
+      });
+    } catch (error) {
+      console.error('Error in getAddProduct:', error);
+      req.flash('error', 'Có lỗi xảy ra khi tải form thêm sản phẩm');
+      res.redirect('/admin/products');
+    }
+  }
+
+  // Xử lý thêm sản phẩm
+  static async postAddProduct(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { name, description, price, quantity, category, features } = req.body;
+      
+      // Xử lý upload ảnh
+      let imageUrl = null;
+      if (req.file) {
+        imageUrl = `/uploads/products/${req.file.filename}`;
+      }
+
+      const Product = require('../models/productModel');
+      await Product.create({
+        name,
+        description,
+        price: parseFloat(price),
+        quantity: parseInt(quantity),
+        category,
+        image_url: imageUrl,
+        features: features ? JSON.stringify(features.split(',').map(f => f.trim())) : null
+      });
+
+      req.flash('success', 'Thêm sản phẩm thành công!');
+      res.redirect('/admin/products');
+    } catch (error) {
+      console.error('Error in postAddProduct:', error);
+      req.flash('error', 'Có lỗi xảy ra khi thêm sản phẩm');
+      res.redirect('/admin/products/add');
+    }
+  }
+
+  // Hiển thị form sửa sản phẩm
+  static async getEditProduct(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { id } = req.params;
+      const Product = require('../models/productModel');
+      const product = await Product.findById(id);
+
+      if (!product) {
+        req.flash('error', 'Không tìm thấy sản phẩm!');
+        return res.redirect('/admin/products');
+      }
+
+      res.render('admin/products/edit', {
+        title: 'Sửa Sản phẩm',
+        user: req.session.user,
+        product
+      });
+    } catch (error) {
+      console.error('Error in getEditProduct:', error);
+      req.flash('error', 'Có lỗi xảy ra khi tải form sửa sản phẩm');
+      res.redirect('/admin/products');
+    }
+  }
+
+  // Xử lý sửa sản phẩm
+  static async postEditProduct(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { id } = req.params;
+      const { name, description, price, quantity, category, features } = req.body;
+      
+      // Xử lý upload ảnh
+      let imageUrl = req.body.current_image;
+      if (req.file) {
+        imageUrl = `/uploads/products/${req.file.filename}`;
+      }
+
+      const Product = require('../models/productModel');
+      const success = await Product.update(id, {
+        name,
+        description,
+        price: parseFloat(price),
+        quantity: parseInt(quantity),
+        category,
+        image_url: imageUrl,
+        features: features ? JSON.stringify(features.split(',').map(f => f.trim())) : null
+      });
+
+      if (success) {
+        req.flash('success', 'Cập nhật sản phẩm thành công!');
+      } else {
+        req.flash('error', 'Không thể cập nhật sản phẩm!');
+      }
+      
+      res.redirect('/admin/products');
+    } catch (error) {
+      console.error('Error in postEditProduct:', error);
+      req.flash('error', 'Có lỗi xảy ra khi cập nhật sản phẩm');
+      res.redirect(`/admin/products/${req.params.id}/edit`);
+    }
+  }
+
+  // Xóa sản phẩm
+  static async deleteProduct(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      const Product = require('../models/productModel');
+      const success = await Product.delete(id);
+
+      if (success) {
+        res.json({ success: true, message: 'Xóa sản phẩm thành công!' });
+      } else {
+        res.json({ success: false, message: 'Không thể xóa sản phẩm!' });
+      }
+    } catch (error) {
+      console.error('Error in deleteProduct:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi xóa sản phẩm' });
+    }
+  }
+
   // ==================== EMPLOYEE MANAGEMENT ====================
   
   // Hiển thị danh sách employees
@@ -751,22 +896,27 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      // Mock data for orders
-      const orders = [
-        {
-          id: 1,
-          customer_name: 'Nguyễn Văn A',
-          items_count: 3,
-          total_amount: 500000,
-          status: 'pending',
-          created_at: '2024-01-15'
-        }
-      ];
+      const Order = require('../models/orderModel');
+      const orders = await Order.findAll();
+      
+      // Thêm thông tin số lượng sản phẩm cho mỗi đơn hàng
+      const ordersWithItems = await Promise.all(orders.map(async (order) => {
+        const [items] = await db.execute(`
+          SELECT COUNT(*) as items_count 
+          FROM order_items 
+          WHERE order_id = ?
+        `, [order.id]);
+        
+        return {
+          ...order,
+          items_count: items[0].items_count
+        };
+      }));
       
       res.render('admin/orders', {
         title: 'Quản lý Đơn hàng',
         user: req.session.user,
-        orders
+        orders: ordersWithItems
       });
     } catch (error) {
       console.error('Error in getOrders:', error);
@@ -774,6 +924,93 @@ class AdminController {
         message: 'Có lỗi xảy ra khi tải danh sách đơn hàng',
         error: error 
       });
+    }
+  }
+
+  // Hiển thị chi tiết đơn hàng
+  static async getViewOrder(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { id } = req.params;
+      const Order = require('../models/orderModel');
+      const order = await Order.findById(id);
+
+      if (!order) {
+        req.flash('error', 'Không tìm thấy đơn hàng!');
+        return res.redirect('/admin/orders');
+      }
+
+      // Lấy chi tiết sản phẩm trong đơn hàng
+      const [orderItems] = await db.execute(`
+        SELECT oi.*, p.name as product_name, p.image_url as product_image
+        FROM order_items oi
+        LEFT JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+      `, [id]);
+
+      res.render('admin/orders/view', {
+        title: 'Chi tiết đơn hàng',
+        user: req.session.user,
+        order,
+        orderItems
+      });
+    } catch (error) {
+      console.error('Error in getViewOrder:', error);
+      req.flash('error', 'Có lỗi xảy ra khi tải chi tiết đơn hàng');
+      res.redirect('/admin/orders');
+    }
+  }
+
+  // Cập nhật trạng thái đơn hàng
+  static async updateOrderStatus(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      const Order = require('../models/orderModel');
+      const success = await Order.updateStatus(id, status);
+
+      if (success) {
+        res.json({ success: true, message: 'Cập nhật trạng thái thành công!' });
+      } else {
+        res.json({ success: false, message: 'Không thể cập nhật trạng thái!' });
+      }
+    } catch (error) {
+      console.error('Error in updateOrderStatus:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi cập nhật trạng thái' });
+    }
+  }
+
+  // Xóa đơn hàng
+  static async deleteOrder(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      
+      // Xóa order_items trước
+      await db.execute('DELETE FROM order_items WHERE order_id = ?', [id]);
+      
+      // Sau đó xóa order
+      const [result] = await db.execute('DELETE FROM orders WHERE id = ?', [id]);
+
+      if (result.affectedRows > 0) {
+        res.json({ success: true, message: 'Xóa đơn hàng thành công!' });
+      } else {
+        res.json({ success: false, message: 'Không thể xóa đơn hàng!' });
+      }
+    } catch (error) {
+      console.error('Error in deleteOrder:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi xóa đơn hàng' });
     }
   }
 

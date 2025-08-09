@@ -327,7 +327,7 @@
                         <div class="product-info">
                             <h3 class="product-name"><%= product.name %></h3>
                             <div class="product-price">
-                                <%= product.price.toLocaleString('vi-VN') %> VNĐ
+                                <%= formatPrice(product.price) %>
                                 <span class="quantity-status <%= product.quantity > 10 ? 'quantity-in-stock' : product.quantity > 0 ? 'quantity-low' : 'quantity-out' %>">
                                     <%= product.quantity > 10 ? 'Còn hàng' : product.quantity > 0 ? 'Sắp hết' : 'Hết hàng' %>
                                 </span>

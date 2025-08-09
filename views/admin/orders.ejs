@@ -569,7 +569,7 @@
                                 <td><strong>#<%= order.id %></strong></td>
                                 <td><%= order.customer_name %></td>
                                 <td><%= order.items_count %> sản phẩm</td>
-                                <td class="price"><%= order.total_amount.toLocaleString('vi-VN') %> ₫</td>
+                                                                 <td class="price"><%= formatPrice(order.total_amount || 0) %></td>
                                 <td><%= new Date(order.created_at).toLocaleDateString('vi-VN') %></td>
                                 <td>
                                     <span class="status-badge status-<%= order.status %>">

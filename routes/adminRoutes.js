@@ -77,6 +77,11 @@ router.post('/stylists/:id/delete', requireAdmin, adminController.deleteStylist)
 
 // Quản lý products
 router.get('/products', requireAdmin, adminController.getProducts);
+router.get('/products/add', requireAdmin, adminController.getAddProduct);
+router.post('/products/add', requireAdmin, adminController.postAddProduct);
+router.get('/products/:id/edit', requireAdmin, adminController.getEditProduct);
+router.post('/products/:id/edit', requireAdmin, adminController.postEditProduct);
+router.post('/products/:id/delete', requireAdmin, adminController.deleteProduct);
 
 // Quản lý categories
 router.get('/categories', requireAdmin, categoryController.getCategories);
@@ -98,11 +103,8 @@ router.post('/employees/:id/delete', requireAdmin, adminController.deleteEmploye
 
 // Quản lý orders
 router.get('/orders', requireAdmin, adminController.getOrders);
-router.get('/orders/add', requireAdmin, adminController.getAddOrder);
-router.post('/orders/add', requireAdmin, adminController.postAddOrder);
 router.get('/orders/:id/view', requireAdmin, adminController.getViewOrder);
-router.get('/orders/:id/edit', requireAdmin, adminController.getEditOrder);
-router.post('/orders/:id/edit', requireAdmin, adminController.postEditOrder);
+router.post('/orders/:id/status', requireAdmin, adminController.updateOrderStatus);
 router.post('/orders/:id/delete', requireAdmin, adminController.deleteOrder);
 
 // Quản lý reviews

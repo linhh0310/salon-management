@@ -631,17 +631,17 @@
             </div>
             <div class="hero-models">
                 <div class="model-card">
-                    <img src="/images/model1.jpg" alt="Model 2" onerror="this.src='https://via.placeholder.com/120x120/1e3a8a/ffffff?text=Model+2'">
+                                                <img src="/images/model1.jpg" alt="Model 2" onerror="this.src='/images/logo.png'">
                     <h4>Kiểu tóc hiện đại</h4>
                     <p>Phong cách nam tính</p>
                 </div>
                 <div class="model-card">
-                    <img src="/images/model2.jpg" alt="Model 2" onerror="this.src='https://via.placeholder.com/120x120/1e3a8a/ffffff?text=Model+2'">
+                                                <img src="/images/model2.jpg" alt="Model 2" onerror="this.src='/images/logo.png'">
                     <h4>Undercut phong cách</h4>
                     <p>Thời trang & nổi bật</p>
                 </div>
                 <div class="model-card">
-                    <img src="/images/model3.jpg" alt="Model 3" onerror="this.src='https://via.placeholder.com/120x120/60a5fa/ffffff?text=Model+3'">
+                                                <img src="/images/model3.jpg" alt="Model 3" onerror="this.src='/images/logo.png'">
                     <h4>Fade đẹp mắt</h4>
                     <p>Chuyên nghiệp</p>
                 </div>
@@ -654,21 +654,21 @@
         <div class="container">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
                 <div class="content-block" style="background: #f8fafc; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <img src="/images/brother-collection.jpg" alt="Bộ sưu tập anh trai" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x200/3b82f6/ffffff?text=Bộ+sưu+tập+anh+trai'">
+                                            <img src="/images/brother-collection.jpg" alt="Bộ sưu tập anh trai" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='/images/logo.png'">
                     <div style="padding: 20px;">
                         <h3 style="color: #1e3a8a; font-size: 1.3rem; margin-bottom: 10px;">BỘ SƯU TẬP ANH TRAI SAY HAIR</h3>
                         <p style="color: #64748b;">Phong cách nam tính, hiện đại và đầy cá tính</p>
                     </div>
                 </div>
                 <div class="content-block" style="background: #f8fafc; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <img src="/images/k-perm.jpg" alt="K-Perm Ready" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x200/1e3a8a/ffffff?text=K-PERM+READY'">
+                                            <img src="/images/k-perm.jpg" alt="K-Perm Ready" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='/images/logo.png'">
                     <div style="padding: 20px;">
                         <h3 style="color: #1e3a8a; font-size: 1.3rem; margin-bottom: 10px;">BTS K-PERM READY for NEW GAME</h3>
                         <p style="color: #64748b;">Kiểu tóc uốn đẹp, phong cách Hàn Quốc</p>
                     </div>
                 </div>
                 <div class="content-block" style="background: #f8fafc; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <img src="/images/bad-boy.jpg" alt="Bad Boy Style" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x200/60a5fa/ffffff?text=BAD+BOY'">
+                                            <img src="/images/bad-boy.jpg" alt="Bad Boy Style" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.src='/images/logo.png'">
                     <div style="padding: 20px;">
                         <h3 style="color: #1e3a8a; font-size: 1.3rem; margin-bottom: 10px;">BAD BOY</h3>
                         <p style="color: #64748b;">Phong cách cá tính, mạnh mẽ và nổi bật</p>
@@ -705,7 +705,7 @@
                     </div>
                 </div>
                 <div class="news-card">
-                    <img src="/images/news4.jpg" alt="Hair Styling" onerror="this.src='https://via.placeholder.com/350x200/3b82f6/ffffff?text=Hair+Styling'">
+                                                <img src="/images/news4.jpg" alt="Hair Styling" onerror="this.src='/images/logo.png'">
                     <div class="news-card-content">
                         <h4>Chuỗi cắt tóc nam với 1000+ khách hàng tìm đường</h4>
                         <p>Dịch vụ chất lượng cao với đội ngũ stylist chuyên nghiệp và tận tâm...</p>
@@ -909,10 +909,10 @@
                             '</div>' +
                             '<div class="product-content">' +
                                 '<h4>' + product.name + '</h4>' +
-                                '<div class="price">' + product.price.toLocaleString('vi-VN') + ' VNĐ</div>' +
+                                '<div class="price">₫ ' + product.price.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, '.') + '</div>' +
                                 '<div style="font-size: 0.9rem; color: #28a745; margin-bottom: 10px;">Đã bán: ' + (product.sales_count || 0) + '</div>' +
                                 '<ul class="product-features">' +
-                                    (product.features ? product.features.slice(0, 3).map(function(feature) { return '<li>' + feature + '</li>'; }).join('') : '') +
+                                    (product.features && Array.isArray(product.features) ? product.features.slice(0, 3).map(function(feature) { return '<li>' + feature + '</li>'; }).join('') : '') +
                                 '</ul>' +
                                 '<div class="product-actions">' +
                                     '<button class="btn-buy-now" onclick="buyNow(' + product.id + ')">Mua ngay</button>' +

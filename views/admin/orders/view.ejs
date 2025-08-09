@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .order-detail-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .order-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .order-id {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .order-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .info-value {
+            color: #6c757d;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d1ecf1; color: #0c5460; }
+        .status-shipped { background: #d4edda; color: #155724; }
+        .status-delivered { background: #c3e6cb; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .order-items {
+            margin-bottom: 30px;
+        }
+
+        .items-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .item-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .item-quantity {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .order-total {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: right;
+        }
+
+        .total-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="order-detail-container">
+        <div class="order-header">
+            <div class="order-title">
+                <i class="fas fa-shopping-cart"></i> Chi tiết đơn hàng
+            </div>
+            <div class="order-id">#<%= order.id %></div>
+        </div>
+
+        <div class="order-info">
+            <div class="info-section">
+                <h3><i class="fas fa-user"></i> Thông tin khách hàng</h3>
+                <div class="info-row">
+                    <span class="info-label">Tên khách hàng:</span>
+                    <span class="info-value"><%= order.customer_name %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Họ tên người nhận:</span>
+                    <span class="info-value"><%= order.full_name || 'Chưa có' %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Số điện thoại:</span>
+                    <span class="info-value"><%= order.phone || 'Chưa có' %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value"><%= order.email || 'Chưa có' %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tỉnh/thành phố:</span>
+                    <span class="info-value"><%= order.province || 'Chưa có' %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Quận/huyện:</span>
+                    <span class="info-value"><%= order.district || 'Chưa có' %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phường/xã:</span>
+                    <span class="info-value"><%= order.ward || 'Chưa có' %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Địa chỉ chi tiết:</span>
+                    <span class="info-value"><%= order.shipping_address || 'Chưa có' %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phương thức thanh toán:</span>
+                    <span class="info-value"><%= order.payment_method || 'Chưa chọn' %></span>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h3>
+                <div class="info-row">
+                    <span class="info-label">Ngày đặt:</span>
+                    <span class="info-value"><%= new Date(order.created_at).toLocaleDateString('vi-VN') %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Trạng thái:</span>
+                    <span class="status-badge status-<%= order.status %>">
+                        <% if (order.status === 'pending') { %>Chờ xác nhận<% } %>
+                        <% if (order.status === 'confirmed') { %>Đã xác nhận<% } %>
+                        <% if (order.status === 'shipped') { %>Đang giao<% } %>
+                        <% if (order.status === 'delivered') { %>Đã giao<% } %>
+                        <% if (order.status === 'cancelled') { %>Đã hủy<% } %>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Ghi chú:</span>
+                    <span class="info-value"><%= order.notes || 'Không có' %></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-items">
+            <div class="items-header">
+                <i class="fas fa-box"></i> Sản phẩm trong đơn hàng
+            </div>
+            
+            <% if (orderItems && orderItems.length > 0) { %>
+                <% orderItems.forEach(function(item) { %>
+                    <div class="item-card">
+                        <img src="<%= item.product_image || '/images/product1.jpg' %>" alt="<%= item.product_name %>" class="item-image" onerror="this.src='/images/product1.jpg'">
+                        <div class="item-details">
+                            <div class="item-name"><%= item.product_name %></div>
+                            <div class="item-price"><%= formatPrice(item.price || 0) %></div>
+                            <div class="item-quantity">Số lượng: <%= item.quantity %></div>
+                        </div>
+                        <div class="item-total">
+                            <strong><%= formatPrice(item.price * item.quantity) %></strong>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p style="text-align: center; color: #6c757d; padding: 20px;">Không có sản phẩm nào trong đơn hàng</p>
+            <% } %>
+        </div>
+
+        <div class="order-total">
+            <div class="total-amount">
+                                        Tổng cộng: <%= formatPrice(order.total_amount || 0) %>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/admin/orders" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            
+            <% if (order.status === 'pending') { %>
+                <button class="btn btn-success" onclick="updateStatus('confirmed')">
+                    <i class="fas fa-check"></i> Xác nhận đơn hàng
+                </button>
+                <button class="btn btn-danger" onclick="updateStatus('cancelled')">
+                    <i class="fas fa-times"></i> Hủy đơn hàng
+                </button>
+            <% } %>
+            
+            <% if (order.status === 'confirmed') { %>
+                <button class="btn btn-primary" onclick="updateStatus('shipped')">
+                    <i class="fas fa-shipping-fast"></i> Bắt đầu giao hàng
+                </button>
+            <% } %>
+            
+            <% if (order.status === 'shipped') { %>
+                <button class="btn btn-success" onclick="updateStatus('delivered')">
+                    <i class="fas fa-check-double"></i> Hoàn thành giao hàng
+                </button>
+            <% } %>
+            
+            <button class="btn btn-danger" onclick="deleteOrder()">
+                <i class="fas fa-trash"></i> Xóa đơn hàng
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus(status) {
+            const statusText = {
+                'confirmed': 'xác nhận',
+                'shipped': 'bắt đầu giao hàng',
+                'delivered': 'hoàn thành giao hàng',
+                'cancelled': 'hủy'
+            };
+            
+            if (confirm(`Bạn có chắc muốn ${statusText[status]} đơn hàng này?`)) {
+                fetch(`/admin/orders/<%= order.id %>/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: status })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Có lỗi xảy ra: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi cập nhật trạng thái');
+                });
+            }
+        }
+
+        function deleteOrder() {
+            if (confirm('Bạn có chắc muốn xóa đơn hàng này?')) {
+                fetch(`/admin/orders/<%= order.id %>/delete`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = '/admin/orders';
+                    } else {
+                        alert('Có lỗi xảy ra: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa đơn hàng');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
+

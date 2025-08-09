@@ -36,12 +36,28 @@ class Order {
   // Tạo đơn hàng mới
   static async create(orderData) {
     try {
-      const { user_id, total_amount, shipping_address, payment_method, notes } = orderData;
+      const { 
+        user_id, 
+        total_amount, 
+        shipping_address, 
+        province,
+        district,
+        ward,
+        full_name,
+        phone,
+        email,
+        payment_method, 
+        notes 
+      } = orderData;
       
       const [result] = await db.execute(`
-        INSERT INTO orders (user_id, total_amount, shipping_address, payment_method, notes, created_at) 
-        VALUES (?, ?, ?, ?, ?, NOW())
-      `, [user_id, total_amount, shipping_address, payment_method, notes]);
+        INSERT INTO orders (
+          user_id, total_amount, shipping_address, province, district, ward, 
+          full_name, phone, email, payment_method, notes, created_at
+        ) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+      `, [user_id, total_amount, shipping_address, province, district, ward, 
+           full_name, phone, email, payment_method, notes]);
       
       return result.insertId;
     } catch (error) {
@@ -90,6 +106,38 @@ class Order {
       return rows;
     } catch (error) {
       console.error('Error in Order.findByStatus:', error);
+      throw error;
+    }
+  }
+
+  // Lấy đơn hàng theo user_id
+  static async findByUserId(userId) {
+    try {
+      const [rows] = await db.execute(`
+        SELECT o.*, u.name as customer_name 
+        FROM orders o 
+        LEFT JOIN users u ON o.user_id = u.id 
+        WHERE o.user_id = ?
+        ORDER BY o.created_at DESC
+      `, [userId]);
+      return rows;
+    } catch (error) {
+      console.error('Error in Order.findByUserId:', error);
+      throw error;
+    }
+  }
+
+  // Tạo order_items cho đơn hàng
+  static async createOrderItems(orderId, items) {
+    try {
+      for (const item of items) {
+        await db.execute(`
+          INSERT INTO order_items (order_id, product_id, quantity, price) 
+          VALUES (?, ?, ?, ?)
+        `, [orderId, item.product_id, item.quantity, item.price]);
+      }
+    } catch (error) {
+      console.error('Error in Order.createOrderItems:', error);
       throw error;
     }
   }

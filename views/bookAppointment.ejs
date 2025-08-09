@@ -489,6 +489,439 @@
         </div>
     </div>
 
+    <!-- Success Modal -->
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-check-circle"></i> Đặt lịch thành công!</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="booking-receipt">
+                    <div class="receipt-header">
+                        <h3>LYN SALON</h3>
+                        <p>Hóa đơn đặt lịch</p>
+                    </div>
+                    <div class="receipt-details" id="receiptDetails">
+                        <!-- Details will be filled by JavaScript -->
+                    </div>
+                    <div class="receipt-total">
+                        <div class="total-row">
+                            <span>Tổng cộng:</span>
+                            <span id="totalAmount">0 VNĐ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="payment-options">
+                    <h4>Chọn phương thức thanh toán:</h4>
+                    <div class="payment-methods">
+                        <label class="payment-method">
+                            <input type="radio" name="payment" value="cash" checked>
+                            <span class="method-icon">💵</span>
+                            <span>Tiền mặt</span>
+                        </label>
+                        <label class="payment-method">
+                            <input type="radio" name="payment" value="bank">
+                            <span class="method-icon">🏦</span>
+                            <span>Chuyển khoản</span>
+                        </label>
+                        <label class="payment-method">
+                            <input type="radio" name="payment" value="momo">
+                            <span class="method-icon">📱</span>
+                            <span>MoMo</span>
+                        </label>
+                    </div>
+                    
+                    <!-- QR Code Section -->
+                    <div id="qrCodeSection" class="qr-code-section" style="display: none;">
+                        <div class="qr-container">
+                            <div class="qr-header">
+                                <div class="bank-info">
+                                    <div class="bank-logo">V</div>
+                                    <span class="bank-name">Vietcombank</span>
+                                </div>
+                                <button class="close-qr" onclick="closeQRCode()">&times;</button>
+                            </div>
+                            <div class="qr-code">
+                                <img src="/images/maqr.png" alt="QR Code Vietcombank" class="qr-image">
+                                <div class="payment-systems">
+                                    <span class="vietqr-logo">VietQR</span>
+                                    <span class="napas-logo">napas 247</span>
+                                </div>
+                            </div>
+                            <div class="recipient-info">
+                                <div class="recipient-name">PHAM THUY LINH</div>
+                                <div class="account-number">1028689260</div>
+                            </div>
+                            <button class="share-btn" onclick="sharePaymentInfo()">
+                                <i class="fas fa-share"></i> Chia sẻ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Đóng</button>
+                <button class="btn btn-primary" onclick="proceedToPayment()">Thanh toán ngay</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            position: fixed;
+            z-index: 99999 !important;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Đảm bảo modal này hiển thị trên tất cả modal khác */
+        #successModal {
+            z-index: 99999 !important;
+        }
+
+        /* Ẩn modal đăng ký trên trang đặt lịch */
+        #registerModal {
+            display: none !important;
+        }
+
+        /* Ẩn modal đăng nhập trên trang đặt lịch */
+        #loginModal {
+            display: none !important;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .booking-receipt {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-header h3 {
+            color: #007bff;
+            margin: 0 0 5px 0;
+        }
+
+        .receipt-header p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .receipt-details {
+            margin-bottom: 20px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .receipt-value {
+            color: #6c757d;
+        }
+
+        .receipt-total {
+            border-top: 2px solid #dee2e6;
+            padding-top: 15px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .payment-options {
+            margin-top: 20px;
+        }
+
+        .payment-options h4 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .payment-method {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-method:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .payment-method input[type="radio"] {
+            display: none;
+        }
+
+        .payment-method input[type="radio"]:checked + .method-icon {
+            color: #007bff;
+        }
+
+        .payment-method input[type="radio"]:checked ~ span:last-child {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .method-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        /* QR Code Styles */
+        .qr-code-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .qr-container {
+            text-align: center;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .qr-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .bank-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bank-logo {
+            width: 30px;
+            height: 30px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .bank-name {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .close-qr {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-qr:hover {
+            color: #dc3545;
+        }
+
+        .qr-code {
+            margin-bottom: 20px;
+        }
+
+        .qr-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .payment-systems {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .vietqr-logo {
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .napas-logo {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .recipient-info {
+            margin-bottom: 20px;
+        }
+
+        .recipient-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .account-number {
+            font-size: 1.2rem;
+            color: #007bff;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .share-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+            transition: all 0.3s;
+        }
+
+        .share-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+    </style>
+
     <script>
         // Hiển thị thông tin dịch vụ khi chọn
         document.getElementById('service_id').addEventListener('change', function() {
@@ -532,9 +965,200 @@
             }
         });
         
-        // Cập nhật step khi submit form
-        document.getElementById('bookingForm').addEventListener('submit', function() {
-            updateStep(4);
+        // Xử lý submit form với AJAX
+        document.addEventListener('DOMContentLoaded', function() {
+            const bookingForm = document.getElementById('bookingForm');
+            if (bookingForm) {
+                // Remove any existing event listeners
+                const newForm = bookingForm.cloneNode(true);
+                bookingForm.parentNode.replaceChild(newForm, bookingForm);
+                
+                newForm.addEventListener('submit', function(e) {
+                    console.log('🎯 Form submit triggered!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    
+                    // Prevent any modal from opening
+                    const registerModal = document.getElementById('registerModal');
+                    if (registerModal) {
+                        registerModal.style.display = 'none';
+                    }
+                    
+                    updateStep(4);
+                    
+                    const formData = new FormData(this);
+                    const data = Object.fromEntries(formData);
+                    
+                    console.log('📋 Form data:', data);
+                    
+                    // Disable submit button to prevent double submission
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Đang xử lý...';
+                    }
+                    
+                    fetch('/book-appointment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        console.log('📡 Response status:', response.status);
+                        return response.json();
+                    })
+                    .then(result => {
+                        console.log('✅ Result:', result);
+                        if (result.success) {
+                            showSuccessModal(result.appointment);
+                        } else {
+                            alert('Có lỗi xảy ra: ' + result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error:', error);
+                        alert('Có lỗi xảy ra khi đặt lịch');
+                    })
+                    .finally(() => {
+                        // Re-enable submit button
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Đặt lịch hẹn';
+                        }
+                    });
+                });
+            }
+        });
+        
+        // Hiển thị modal thành công
+        function showSuccessModal(appointment) {
+            console.log('🎉 Showing success modal with appointment:', appointment);
+            
+            const modal = document.getElementById('successModal');
+            const receiptDetails = document.getElementById('receiptDetails');
+            const totalAmount = document.getElementById('totalAmount');
+            
+            if (!modal) {
+                console.error('❌ Modal not found!');
+                alert('Modal không tìm thấy!');
+                return;
+            }
+            
+            // Format date
+            const date = new Date(appointment.appointment_date);
+            const formattedDate = date.toLocaleDateString('vi-VN');
+            
+            // Fill receipt details
+            receiptDetails.innerHTML = `
+                <div class="receipt-row">
+                    <span class="receipt-label">Dịch vụ:</span>
+                    <span class="receipt-value">${appointment.service_name}</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Stylist:</span>
+                    <span class="receipt-value">${appointment.stylist_name}</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Ngày hẹn:</span>
+                    <span class="receipt-value">${formattedDate}</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Giờ hẹn:</span>
+                    <span class="receipt-value">${appointment.appointment_time}</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Ghi chú:</span>
+                    <span class="receipt-value">${appointment.notes || 'Không có'}</span>
+                </div>
+            `;
+            
+            // Set total amount
+            totalAmount.textContent = parseInt(appointment.service_price).toLocaleString('vi-VN') + ' VNĐ';
+            
+            // Show modal
+            modal.style.display = 'flex';
+            console.log('✅ Modal should be visible now');
+        }
+        
+        // Đóng modal
+        function closeModal() {
+            document.getElementById('successModal').style.display = 'none';
+            // Reset form
+            document.getElementById('bookingForm').reset();
+            document.getElementById('service-info').style.display = 'none';
+            updateStep(0);
+        }
+        
+        // Xử lý thanh toán
+        function proceedToPayment() {
+            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            
+            if (selectedPayment === 'bank') {
+                showQRCode();
+            } else {
+                alert(`Chức năng thanh toán ${selectedPayment} sẽ được thêm sau!`);
+                closeModal();
+            }
+        }
+
+        // Hiển thị QR code
+        function showQRCode() {
+            const qrSection = document.getElementById('qrCodeSection');
+            if (qrSection) {
+                qrSection.style.display = 'block';
+                // Scroll to QR code
+                qrSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Đóng QR code
+        function closeQRCode() {
+            const qrSection = document.getElementById('qrCodeSection');
+            if (qrSection) {
+                qrSection.style.display = 'none';
+            }
+        }
+
+        // Chia sẻ thông tin thanh toán
+        function sharePaymentInfo() {
+            const paymentInfo = `Vietcombank\nTên TK: PHAM THUY LINH\nSố TK: 1028689260\n\nQuét mã QR để thanh toán nhanh chóng!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Thông tin thanh toán LYN Salon',
+                    text: paymentInfo,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: Copy to clipboard
+                navigator.clipboard.writeText(paymentInfo).then(() => {
+                    alert('Đã copy thông tin thanh toán vào clipboard!');
+                }).catch(() => {
+                    alert('Không thể copy thông tin thanh toán');
+                });
+            }
+        }
+
+        // Xử lý khi chọn phương thức thanh toán
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentMethods = document.querySelectorAll('input[name="payment"]');
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', function() {
+                    const qrSection = document.getElementById('qrCodeSection');
+                    if (this.value === 'bank') {
+                        if (qrSection) {
+                            qrSection.style.display = 'block';
+                        }
+                    } else {
+                        if (qrSection) {
+                            qrSection.style.display = 'none';
+                        }
+                    }
+                });
+            });
         });
         
         function updateStep(stepNumber) {

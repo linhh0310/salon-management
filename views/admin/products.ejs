@@ -563,13 +563,13 @@
                                 <tr>
                                     <td><%= product.id %></td>
                                     <td>
-                                        <img src="<%= product.image %>" alt="<%= product.name %>" class="product-image" onerror="this.src='/images/product1.jpg'">
+                                        <img src="<%= product.image_url || product.image %>" alt="<%= product.name %>" class="product-image" onerror="this.src='/images/product1.jpg'">
                                     </td>
                                     <td><%= product.name %></td>
                                     <td>
                                         <span class="category-badge"><%= product.category || 'Chưa phân loại' %></span>
                                     </td>
-                                    <td class="price"><%= product.price.toLocaleString('vi-VN') %> ₫</td>
+                                    <td class="price"><%= formatPrice(product.price) %></td>
                                     <td><%= product.quantity %></td>
                                     <td>
                                         <a href="/admin/products/<%= product.id %>/edit" class="btn-action btn-edit">

@@ -11,7 +11,16 @@ const requireAuth = (req, res, next) => {
   console.log('Session data:', req.session);
   
   if (!req.session.user) {
-    console.log('❌ User chưa đăng nhập, redirect to login');
+    console.log('❌ User chưa đăng nhập');
+    
+    // Kiểm tra nếu request là AJAX
+    if (req.xhr || req.headers.accept && req.headers.accept.indexOf('json') > -1) {
+      return res.status(401).json({
+        success: false,
+        message: 'Vui lòng đăng nhập để tiếp tục'
+      });
+    }
+    
     req.flash('error', 'Vui lòng đăng nhập để tiếp tục');
     return res.redirect('/login');
   }
@@ -96,8 +105,14 @@ router.post('/login', loginValidation, userController.postLogin);
 // Đăng xuất
 router.get('/logout', userController.logout);
 
-// Dashboard user (cần đăng nhập) - Đã xóa để admin chuyển thẳng đến admin dashboard
-// router.get('/dashboard', requireAuth, userController.getDashboard);
+// Dashboard user (cần đăng nhập)
+router.get('/dashboard', requireAuth, userController.getDashboard);
+
+// Đổi mật khẩu (cần đăng nhập)
+router.post('/change-password', requireAuth, userController.changePassword);
+
+// Xem chi tiết đơn hàng (cần đăng nhập)
+router.get('/orders/:id', requireAuth, userController.getOrderDetail);
 
 // Test route để kiểm tra session
 router.get('/test-session', (req, res) => {
@@ -117,8 +132,14 @@ router.get('/test-session', (req, res) => {
 router.get('/book-appointment', requireAuth, userController.getBookAppointment);
 router.post('/book-appointment', requireAuth, bookingValidation, userController.postBookAppointment);
 
+// Xem chi tiết lịch hẹn (cần đăng nhập)
+router.get('/appointments/:id', requireAuth, userController.getAppointmentDetail);
+
 // Hủy lịch hẹn (cần đăng nhập)
 router.post('/cancel-appointment/:id', requireAuth, userController.cancelAppointment);
+
+// Đánh giá lịch hẹn (cần đăng nhập)
+router.post('/rate-appointment/:id', requireAuth, userController.rateAppointment);
 
 // Trang dịch vụ
 router.get('/services', userController.getServices);
@@ -133,5 +154,9 @@ router.get('/cart', requireAuth, (req, res) => {
         user: req.session.user
     });
 });
+
+// Orders
+router.post('/orders/place', requireAuth, userController.placeOrder);
+router.get('/orders/:id', requireAuth, userController.getOrderDetail);
 
 module.exports = router;

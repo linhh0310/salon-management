@@ -3,14 +3,14 @@ const db = require('../config/db');
 class Stylist {
   // Tạo stylist mới
   static async create(stylistData) {
-    const { name, email, phone, experience, image } = stylistData;
+    const { name, phone, email, specialization, experience_years, image_url } = stylistData;
     const query = `
-      INSERT INTO stylists (name, email, phone, experience, image) 
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO stylists (name, phone, email, specialization, experience_years, image_url) 
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
     
     try {
-      const [result] = await db.execute(query, [name, email, phone, experience, image]);
+      const [result] = await db.execute(query, [name, phone, email, specialization, experience_years, image_url]);
       return result.insertId;
     } catch (error) {
       throw error;
@@ -55,15 +55,15 @@ class Stylist {
 
   // Cập nhật stylist
   static async update(id, stylistData) {
-    const { name, email, phone, experience, image } = stylistData;
+    const { name, phone, email, specialization, experience_years, image_url } = stylistData;
     const query = `
       UPDATE stylists 
-      SET name = ?, email = ?, phone = ?, experience = ?, image = ?
+      SET name = ?, phone = ?, email = ?, specialization = ?, experience_years = ?, image_url = ?
       WHERE id = ?
     `;
     
     try {
-      const [result] = await db.execute(query, [name, email, phone, experience, image, id]);
+      const [result] = await db.execute(query, [name, phone, email, specialization, experience_years, image_url, id]);
       return result.affectedRows > 0;
     } catch (error) {
       throw error;

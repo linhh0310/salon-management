@@ -47,12 +47,12 @@ class Product {
   // Tạo sản phẩm mới
   static async create(productData) {
     try {
-      const { name, description, price, quantity, image } = productData;
+      const { name, description, price, quantity, category, image_url, features } = productData;
       
       const [result] = await db.execute(`
-        INSERT INTO products (name, description, price, quantity, image, created_at) 
-        VALUES (?, ?, ?, ?, ?, NOW())
-      `, [name, description, price, quantity, image]);
+        INSERT INTO products (name, description, price, quantity, category, image_url, features, created_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+      `, [name, description, price, quantity, category, image_url, features || null]);
       
       return result.insertId;
     } catch (error) {
@@ -64,14 +64,14 @@ class Product {
   // Cập nhật sản phẩm
   static async update(id, productData) {
     try {
-      const { name, description, price, quantity, image } = productData;
+      const { name, description, price, quantity, category, image_url, features } = productData;
       
       const [result] = await db.execute(`
         UPDATE products 
         SET name = ?, description = ?, price = ?, quantity = ?, 
-            image = ?, updated_at = NOW()
+            category = ?, image_url = ?, features = ?, updated_at = NOW()
         WHERE id = ?
-      `, [name, description, price, quantity, image, id]);
+      `, [name, description, price, quantity, category, image_url, features || null, id]);
       
       return result.affectedRows > 0;
     } catch (error) {
