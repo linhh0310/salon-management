@@ -4,13 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %> - LYN Salon</title>
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 0 20px 10px;
+            color: #bdc3c7;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item.active {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .menu-arrow {
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            background: #f8f9fa;
+        }
+
+        /* Header */
+        .admin-header {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-website-btn {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .view-website-btn:hover {
+            background: #2980b9;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2c3e50;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Appointments Container */
         .appointments-container {
             padding: 20px;
             background: #f8f9fa;
-            min-height: 100vh;
+            min-height: calc(100vh - 80px);
         }
 
         .page-header {
@@ -19,13 +210,6 @@
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 20px;
-        }
-
-        .page-title {
-            color: #2c3e50;
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 10px;
         }
 
         .page-subtitle {
@@ -398,6 +582,19 @@
         }
 
         @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .admin-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
             .filters-grid {
                 grid-template-columns: 1fr;
             }
@@ -417,12 +614,96 @@
     </style>
 </head>
 <body>
-    <%- include('../partials/admin-header') %>
-    
-    <div class="admin-container">
-        <%- include('../partials/admin-sidebar') %>
-        
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name">Admin</div>
+                <div class="profile-status">
+                    <i class="fas fa-circle"></i>
+                    Online
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">MENU ADMIN</div>
+                    <a href="/admin" class="menu-item">
+                        <i class="fas fa-home"></i>
+                        Trang chủ
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/appointments" class="menu-item active">
+                        <i class="fas fa-calendar"></i>
+                        Lịch hẹn
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/services" class="menu-item">
+                        <i class="fas fa-percentage"></i>
+                        Dịch vụ
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/stylists" class="menu-item">
+                        <i class="fas fa-user"></i>
+                        Stylist
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/products" class="menu-item">
+                        <i class="fas fa-shopping-bag"></i>
+                        Quản lý sản phẩm
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/orders" class="menu-item">
+                        <i class="fas fa-shopping-cart"></i>
+                        Đơn hàng
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/reviews" class="menu-item">
+                        <i class="fas fa-star"></i>
+                        Đánh giá
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/customers" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        Khách hàng
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/contact" class="menu-item">
+                        <i class="fas fa-envelope"></i>
+                        Tin nhắn
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
         <div class="main-content">
+            <!-- Header -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Quản lý Lịch hẹn</h1>
+                </div>
+                <div class="header-right">
+                    <a href="/" class="view-website-btn">
+                        <i class="fas fa-eye"></i>
+                        Xem website
+                    </a>
+                    <div class="admin-profile">
+                        <div class="admin-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="appointments-container">
                 <!-- Page Header -->
                 <div class="page-header">
@@ -646,6 +927,12 @@
     </div>
 
     <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            sidebar.classList.toggle('active');
+        }
+
         // Auto-submit form when filters change
         document.getElementById('status').addEventListener('change', function() {
             this.form.submit();
