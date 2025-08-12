@@ -3,14 +3,14 @@ const db = require('../config/db');
 class Stylist {
   // Tạo stylist mới
   static async create(stylistData) {
-    const { name, phone, email, specialization, experience_years, image_url } = stylistData;
+    const { name, phone, email, specialization, experience, status, bio } = stylistData;
     const query = `
-      INSERT INTO stylists (name, phone, email, specialization, experience_years, image_url) 
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO stylists (name, phone, email, specialization, experience, status, bio, created_at) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
     `;
     
     try {
-      const [result] = await db.execute(query, [name, phone, email, specialization, experience_years, image_url]);
+      const [result] = await db.execute(query, [name, phone, email, specialization, experience, status, bio]);
       return result.insertId;
     } catch (error) {
       throw error;
@@ -23,6 +23,18 @@ class Stylist {
     
     try {
       const [rows] = await db.execute(query, [id]);
+      return rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Tìm stylist theo email
+  static async findByEmail(email) {
+    const query = 'SELECT * FROM stylists WHERE email = ?';
+    
+    try {
+      const [rows] = await db.execute(query, [email]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -55,15 +67,15 @@ class Stylist {
 
   // Cập nhật stylist
   static async update(id, stylistData) {
-    const { name, phone, email, specialization, experience_years, image_url } = stylistData;
+    const { name, phone, email, specialization, experience, status, bio } = stylistData;
     const query = `
       UPDATE stylists 
-      SET name = ?, phone = ?, email = ?, specialization = ?, experience_years = ?, image_url = ?
+      SET name = ?, phone = ?, email = ?, specialization = ?, experience = ?, status = ?, bio = ?, updated_at = NOW()
       WHERE id = ?
     `;
     
     try {
-      const [result] = await db.execute(query, [name, phone, email, specialization, experience_years, image_url, id]);
+      const [result] = await db.execute(query, [name, phone, email, specialization, experience, status, bio, id]);
       return result.affectedRows > 0;
     } catch (error) {
       throw error;

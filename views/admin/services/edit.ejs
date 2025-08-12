@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - LYN Salon</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 0 20px 10px;
+            color: #bdc3c7;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item.active {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .menu-arrow {
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            background: #f8f9fa;
+        }
+
+        /* Header */
+        .admin-header {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-website-btn {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .view-website-btn:hover {
+            background: #2980b9;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2c3e50;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Form Container */
+        .form-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            grid-column: 1 / -1;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .info-box i {
+            margin-right: 8px;
+        }
+
+        .current-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .current-info h4 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .current-info p {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .price-input-group {
+            position: relative;
+        }
+
+        .price-input-group::before {
+            content: "₫";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .price-input-group input {
+            padding-left: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .admin-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name">Admin</div>
+                <div class="profile-status">
+                    <i class="fas fa-circle"></i>
+                    Online
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">MENU ADMIN</div>
+                    <a href="/admin" class="menu-item">
+                        <i class="fas fa-home"></i>
+                        Trang chủ
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/appointments" class="menu-item">
+                        <i class="fas fa-calendar"></i>
+                        Lịch hẹn
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/services" class="menu-item active">
+                        <i class="fas fa-percentage"></i>
+                        Dịch vụ
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/stylists" class="menu-item">
+                        <i class="fas fa-user"></i>
+                        Stylist
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/products" class="menu-item">
+                        <i class="fas fa-shopping-bag"></i>
+                        Quản lý sản phẩm
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/orders" class="menu-item">
+                        <i class="fas fa-shopping-cart"></i>
+                        Đơn hàng
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/reviews" class="menu-item">
+                        <i class="fas fa-star"></i>
+                        Đánh giá
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/customers" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        Khách hàng
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/contact" class="menu-item">
+                        <i class="fas fa-envelope"></i>
+                        Tin nhắn
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Sửa dịch vụ</h1>
+                </div>
+                <div class="header-right">
+                    <a href="/" class="view-website-btn">
+                        <i class="fas fa-eye"></i>
+                        Xem website
+                    </a>
+                    <div class="admin-profile">
+                        <div class="admin-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2 class="form-title">Sửa dịch vụ</h2>
+                        <p class="form-subtitle">Cập nhật thông tin dịch vụ</p>
+                    </div>
+
+                    <div class="current-info">
+                        <h4><i class="fas fa-info-circle"></i> Thông tin hiện tại</h4>
+                        <p><strong>Tên dịch vụ:</strong> <%= service.name %></p>
+                        <p><strong>Danh mục:</strong> <%= service.category_name %></p>
+                        <p><strong>Giá:</strong> ₫<%= service.price.toLocaleString('vi-VN') %></p>
+                        <p><strong>Thời gian:</strong> <%= service.duration %> phút</p>
+                        <p><strong>Trạng thái:</strong> 
+                            <% if (service.status === 'active') { %>
+                                <span style="color: #27ae60;">Đang hoạt động</span>
+                            <% } else { %>
+                                <span style="color: #e74c3c;">Tạm ngưng</span>
+                            <% } %>
+                        </p>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Lưu ý:</strong> Vui lòng điền đầy đủ thông tin bắt buộc để cập nhật dịch vụ.
+                    </div>
+
+                    <form method="POST" action="/admin/services/<%= service.id %>/edit">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name" class="form-label required">Tên dịch vụ</label>
+                                <input type="text" id="name" name="name" class="form-input" required 
+                                       value="<%= service.name %>" placeholder="Nhập tên dịch vụ">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category_id" class="form-label required">Danh mục</label>
+                                <select id="category_id" name="category_id" class="form-select" required>
+                                    <option value="">Chọn danh mục</option>
+                                    <% categories.forEach(function(category) { %>
+                                        <option value="<%= category.id %>" <%= category.id == service.category_id ? 'selected' : '' %>>
+                                            <%= category.name %>
+                                        </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="price" class="form-label required">Giá dịch vụ</label>
+                                <div class="price-input-group">
+                                    <input type="number" id="price" name="price" class="form-input" required 
+                                           min="0" value="<%= service.price %>" placeholder="0">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="duration" class="form-label required">Thời gian (phút)</label>
+                                <input type="number" id="duration" name="duration" class="form-input" required 
+                                       min="1" value="<%= service.duration %>" placeholder="30">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status" class="form-label">Trạng thái</label>
+                                <select id="status" name="status" class="form-select">
+                                    <option value="active" <%= service.status === 'active' ? 'selected' : '' %>>Đang hoạt động</option>
+                                    <option value="inactive" <%= service.status === 'inactive' ? 'selected' : '' %>>Tạm ngưng</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="description" class="form-label">Mô tả</label>
+                                <textarea id="description" name="description" class="form-textarea" 
+                                          placeholder="Mô tả chi tiết về dịch vụ (không bắt buộc)"><%= service.description || '' %></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i>
+                                Cập nhật dịch vụ
+                            </button>
+                            <a href="/admin/services" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#e74c3c';
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+
+            // Validate price
+            const price = document.getElementById('price').value;
+            if (price && parseFloat(price) < 0) {
+                isValid = false;
+                document.getElementById('price').style.borderColor = '#e74c3c';
+            }
+
+            // Validate duration
+            const duration = document.getElementById('duration').value;
+            if (duration && parseInt(duration) < 1) {
+                isValid = false;
+                document.getElementById('duration').style.borderColor = '#e74c3c';
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc và đảm bảo giá trị hợp lệ!');
+            }
+        });
+
+        // Format price input
+        document.getElementById('price').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            if (value) {
+                e.target.value = parseInt(value);
+            }
+        });
+    </script>
+</body>
+</html>

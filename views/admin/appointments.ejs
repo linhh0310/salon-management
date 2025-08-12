@@ -627,12 +627,12 @@
                     Online
                 </div>
             </div>
-            
+
             <div class="sidebar-menu">
                 <div class="menu-section">
                     <div class="menu-title">MENU ADMIN</div>
                     <a href="/admin" class="menu-item">
-                        <i class="fas fa-home"></i>
+                            <i class="fas fa-home"></i>
                         Trang chủ
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
@@ -652,34 +652,34 @@
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
                     <a href="/admin/products" class="menu-item">
-                        <i class="fas fa-shopping-bag"></i>
+                            <i class="fas fa-shopping-bag"></i>
                         Quản lý sản phẩm
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
                     <a href="/admin/orders" class="menu-item">
-                        <i class="fas fa-shopping-cart"></i>
+                            <i class="fas fa-shopping-cart"></i>
                         Đơn hàng
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
                     <a href="/admin/reviews" class="menu-item">
-                        <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
                         Đánh giá
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
                     <a href="/admin/customers" class="menu-item">
-                        <i class="fas fa-users"></i>
+                            <i class="fas fa-users"></i>
                         Khách hàng
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
                     <a href="/admin/contact" class="menu-item">
-                        <i class="fas fa-envelope"></i>
+                            <i class="fas fa-envelope"></i>
                         Tin nhắn
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
                 </div>
             </div>
         </div>
-
+        
         <!-- Main Content -->
         <div class="main-content">
             <!-- Header -->
@@ -697,7 +697,7 @@
                     </a>
                     <div class="admin-profile">
                         <div class="admin-avatar">
-                            <i class="fas fa-user"></i>
+                        <i class="fas fa-user"></i>
                         </div>
                         <span>Admin</span>
                     </div>
@@ -779,7 +779,7 @@
                         </div>
                     </form>
                 </div>
-
+                
                 <!-- Appointments Table -->
                 <div class="appointments-table">
                     <div class="table-header">
@@ -793,21 +793,21 @@
                     <div class="table-container">
                         <% if (appointments && appointments.length > 0) { %>
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Khách hàng</th>
-                                    <th>Dịch vụ</th>
-                                    <th>Stylist</th>
-                                    <th>Ngày</th>
-                                    <th>Giờ</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% appointments.forEach(function(appointment) { %>
-                                <tr>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Dịch vụ</th>
+                                <th>Stylist</th>
+                                <th>Ngày</th>
+                                <th>Giờ</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% appointments.forEach(function(appointment) { %>
+                            <tr>
                                     <td><strong>#<%= appointment.id %></strong></td>
                                     <td>
                                         <div>
@@ -825,40 +825,40 @@
                                             <% } %>
                                         </div>
                                     </td>
-                                    <td><%= appointment.stylist_name %></td>
+                                <td><%= appointment.stylist_name %></td>
                                     <td>
                                         <div>
                                             <strong><%= new Date(appointment.appointment_date).toLocaleDateString('vi-VN') %></strong>
                                         </div>
                                     </td>
-                                    <td><%= appointment.appointment_time %></td>
-                                    <td>
-                                        <span class="status-badge status-<%= appointment.status %>">
-                                            <% if (appointment.status === 'pending') { %>
+                                <td><%= appointment.appointment_time %></td>
+                                <td>
+                                    <span class="status-badge status-<%= appointment.status %>">
+                                        <% if (appointment.status === 'pending') { %>
                                                 <i class="fas fa-clock"></i> Chờ xác nhận
-                                            <% } else if (appointment.status === 'confirmed') { %>
+                                        <% } else if (appointment.status === 'confirmed') { %>
                                                 <i class="fas fa-check"></i> Đã xác nhận
-                                            <% } else if (appointment.status === 'completed') { %>
+                                        <% } else if (appointment.status === 'completed') { %>
                                                 <i class="fas fa-check-double"></i> Hoàn thành
                                             <% } else if (appointment.status === 'cancelled') { %>
                                                 <i class="fas fa-times"></i> Đã hủy
-                                            <% } %>
-                                        </span>
-                                    </td>
-                                    <td>
+                                        <% } %>
+                                    </span>
+                                </td>
+                                <td>
                                         <div class="action-buttons">
-                                            <% if (appointment.status === 'pending') { %>
+                                    <% if (appointment.status === 'pending') { %>
                                                 <form method="POST" action="/admin/appointments/<%= appointment.id %>/status" style="display: inline;">
                                                     <input type="hidden" name="status" value="confirmed">
                                                     <button type="submit" class="action-btn btn-confirm" onclick="return confirm('Xác nhận lịch hẹn này?')">
-                                                        <i class="fas fa-check"></i> Xác nhận
-                                                    </button>
+                                            <i class="fas fa-check"></i> Xác nhận
+                                        </button>
                                                 </form>
                                                 <form method="POST" action="/admin/appointments/<%= appointment.id %>/status" style="display: inline;">
                                                     <input type="hidden" name="status" value="cancelled">
                                                     <button type="submit" class="action-btn btn-cancel" onclick="return confirm('Hủy lịch hẹn này?')">
-                                                        <i class="fas fa-times"></i> Hủy
-                                                    </button>
+                                            <i class="fas fa-times"></i> Hủy
+                                        </button>
                                                 </form>
                                             <% } else if (appointment.status === 'confirmed') { %>
                                                 <form method="POST" action="/admin/appointments/<%= appointment.id %>/status" style="display: inline;">
@@ -867,23 +867,23 @@
                                                         <i class="fas fa-check-double"></i> Hoàn thành
                                                     </button>
                                                 </form>
-                                            <% } %>
+                                    <% } %>
                                             
                                             <a href="/admin/appointments/<%= appointment.id %>/edit" class="action-btn btn-edit">
-                                                <i class="fas fa-edit"></i> Sửa
+                                        <i class="fas fa-edit"></i> Sửa
                                             </a>
                                             
                                             <form method="POST" action="/admin/appointments/<%= appointment.id %>/delete" style="display: inline;">
                                                 <button type="submit" class="action-btn btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa lịch hẹn này?')">
-                                                    <i class="fas fa-trash"></i> Xóa
-                                                </button>
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
                                             </form>
                                         </div>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
                         <% } else { %>
                         <div class="no-appointments">
                             <i class="fas fa-calendar-times"></i>
@@ -945,7 +945,7 @@
 
         // Auto-refresh page every 30 seconds to show latest appointments
         setTimeout(function() {
-            location.reload();
+                        location.reload();
         }, 30000);
     </script>
 </body>

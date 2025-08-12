@@ -545,12 +545,48 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      const stylists = await Stylist.findAll();
+      const { status, search, page = 1 } = req.query;
+      const limit = 10;
+      const offset = (page - 1) * limit;
+
+      let stylists = await Stylist.findAll();
+      
+      // Lọc theo trạng thái
+      if (status) {
+        stylists = stylists.filter(stylist => stylist.status === status);
+      }
+
+      // Tìm kiếm
+      if (search) {
+        stylists = stylists.filter(stylist =>
+          stylist.name?.toLowerCase().includes(search.toLowerCase()) ||
+          stylist.email?.toLowerCase().includes(search.toLowerCase()) ||
+          stylist.phone?.includes(search) ||
+          stylist.specialization?.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      // Tính toán thống kê
+      const stats = {
+        total: stylists.length,
+        active: stylists.filter(s => s.status === 'active').length,
+        inactive: stylists.filter(s => s.status === 'inactive').length
+      };
+
+      // Phân trang
+      const totalPages = Math.ceil(stylists.length / limit);
+      const currentPage = parseInt(page);
+      const paginatedStylists = stylists.slice(offset, offset + limit);
       
       res.render('admin/stylists', {
         title: 'Quản lý stylist',
         user: req.session.user,
-        stylists
+        stylists: paginatedStylists,
+        stats,
+        currentPage,
+        totalPages,
+        status,
+        search
       });
     } catch (error) {
       console.error('Error in getStylists:', error);
@@ -562,15 +598,21 @@ class AdminController {
   }
 
   // Hiển thị form thêm stylist
-  static getAddStylist(req, res) {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-      return res.redirect('/login');
-    }
+  static async getAddStylist(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
 
-    res.render('admin/addStylist', {
-      title: 'Thêm stylist mới',
-      user: req.session.user
-    });
+      res.render('admin/stylists/add', {
+        title: 'Thêm stylist mới',
+        user: req.session.user
+      });
+    } catch (error) {
+      console.error('Error in getAddStylist:', error);
+      req.flash('error', 'Có lỗi xảy ra khi tải form thêm stylist');
+      res.redirect('/admin/stylists');
+    }
   }
 
   // Xử lý thêm stylist
@@ -580,30 +622,37 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.render('admin/addStylist', {
-          title: 'Thêm stylist mới',
-          user: req.session.user,
-          errors: errors.array(),
-          ...req.body // Giữ lại dữ liệu đã nhập
-        });
+      const { name, email, phone, specialization, experience, status, bio } = req.body;
+
+      // Validation
+      if (!name || !email || !phone) {
+        req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+        return res.redirect('/admin/stylists/add');
       }
 
-      const { name, phone, email, specialties, experience, status = 'active' } = req.body;
-      
-      await Stylist.create({ name, phone, email, specialties, experience, status });
+      // Kiểm tra email đã tồn tại
+      const existingStylist = await Stylist.findByEmail(email);
+      if (existingStylist) {
+        req.flash('error', 'Email đã được sử dụng bởi stylist khác');
+        return res.redirect('/admin/stylists/add');
+      }
+
+      await Stylist.create({ 
+        name, 
+        email, 
+        phone, 
+        specialization: specialization || '', 
+        experience: experience || 0, 
+        status: status || 'active',
+        bio: bio || ''
+      });
       
       req.flash('success', 'Thêm stylist thành công!');
       res.redirect('/admin/stylists');
     } catch (error) {
       console.error('Error in postAddStylist:', error);
-      res.render('admin/addStylist', {
-        title: 'Thêm stylist mới',
-        user: req.session.user,
-        errors: [{ msg: 'Có lỗi xảy ra khi thêm stylist' }],
-        ...req.body // Giữ lại dữ liệu đã nhập
-      });
+      req.flash('error', 'Có lỗi xảy ra khi thêm stylist');
+      res.redirect('/admin/stylists/add');
     }
   }
 
@@ -622,8 +671,8 @@ class AdminController {
         return res.redirect('/admin/stylists');
       }
 
-      res.render('admin/editStylist', {
-        title: 'Chỉnh sửa stylist',
+      res.render('admin/stylists/edit', {
+        title: 'Sửa stylist',
         user: req.session.user,
         stylist
       });
@@ -641,23 +690,38 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        const { id } = req.params;
-        const stylist = await Stylist.findById(id);
-        
-        return res.render('admin/editStylist', {
-          title: 'Chỉnh sửa stylist',
-          user: req.session.user,
-          stylist,
-          errors: errors.array()
-        });
+      const { id } = req.params;
+      const { name, email, phone, specialization, experience, status, bio } = req.body;
+
+      // Validation
+      if (!name || !email || !phone) {
+        req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+        return res.redirect(`/admin/stylists/${id}/edit`);
       }
 
-      const { id } = req.params;
-      const { name, phone, email, specialties, experience, status } = req.body;
-      
-      await Stylist.update(id, { name, phone, email, specialties, experience, status });
+      // Kiểm tra stylist tồn tại
+      const existingStylist = await Stylist.findById(id);
+      if (!existingStylist) {
+        req.flash('error', 'Không tìm thấy stylist');
+        return res.redirect('/admin/stylists');
+      }
+
+      // Kiểm tra email đã tồn tại (trừ stylist hiện tại)
+      const stylistWithEmail = await Stylist.findByEmail(email);
+      if (stylistWithEmail && stylistWithEmail.id != id) {
+        req.flash('error', 'Email đã được sử dụng bởi stylist khác');
+        return res.redirect(`/admin/stylists/${id}/edit`);
+      }
+
+      await Stylist.update(id, { 
+        name, 
+        email, 
+        phone, 
+        specialization: specialization || '', 
+        experience: experience || 0, 
+        status: status || 'active',
+        bio: bio || ''
+      });
       
       req.flash('success', 'Cập nhật stylist thành công!');
       res.redirect('/admin/stylists');
