@@ -56,6 +56,10 @@ router.post('/users/:id/delete', requireAdmin, adminController.deleteUser);
 
 // Quản lý appointments
 router.get('/appointments', requireAdmin, adminController.getAppointments);
+router.get('/appointments/add', requireAdmin, adminController.getAddAppointment);
+router.post('/appointments/add', requireAdmin, adminController.postAddAppointment);
+router.get('/appointments/:id/edit', requireAdmin, adminController.getEditAppointment);
+router.post('/appointments/:id/edit', requireAdmin, adminController.postEditAppointment);
 router.post('/appointments/:id/status', requireAdmin, adminController.updateAppointmentStatus);
 router.post('/appointments/:id/delete', requireAdmin, adminController.deleteAppointment);
 

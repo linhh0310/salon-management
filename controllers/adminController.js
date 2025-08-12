@@ -127,7 +127,7 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      const { status, from_date, to_date, page = 1 } = req.query;
+      const { status, from_date, to_date, search, page = 1 } = req.query;
       const limit = 10;
       const offset = (page - 1) * limit;
 
@@ -146,9 +146,22 @@ class AdminController {
         appointments = appointments.filter(apt => apt.appointment_date <= to_date);
       }
 
+      // Search functionality
+      if (search) {
+        appointments = appointments.filter(apt => 
+          apt.customer_name?.toLowerCase().includes(search.toLowerCase()) ||
+          apt.service_name?.toLowerCase().includes(search.toLowerCase()) ||
+          apt.stylist_name?.toLowerCase().includes(search.toLowerCase()) ||
+          apt.notes?.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
       const totalAppointments = appointments.length;
       const totalPages = Math.ceil(totalAppointments / limit);
       const paginatedAppointments = appointments.slice(offset, offset + limit);
+      
+      // Get statistics
+      const stats = await Appointment.getStats();
       
       res.render('admin/appointments', {
         title: 'Quản lý lịch hẹn',
@@ -158,7 +171,9 @@ class AdminController {
         totalPages,
         status,
         from_date,
-        to_date
+        to_date,
+        search,
+        stats
       });
     } catch (error) {
       console.error('Error in getAppointments:', error);
@@ -190,6 +205,163 @@ class AdminController {
     }
   }
 
+  // Hiển thị form thêm lịch hẹn
+  static async getAddAppointment(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const services = await Service.findAll();
+      const stylists = await Stylist.findActive();
+      const users = await User.findAll();
+      
+      res.render('admin/appointments/add', {
+        title: 'Thêm lịch hẹn mới',
+        user: req.session.user,
+        services,
+        stylists,
+        users
+      });
+    } catch (error) {
+      console.error('Error in getAddAppointment:', error);
+      res.status(500).render('error', { 
+        message: 'Có lỗi xảy ra khi tải form thêm lịch hẹn',
+        error: error 
+      });
+    }
+  }
+
+  // Xử lý thêm lịch hẹn
+  static async postAddAppointment(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { user_id, service_id, stylist_id, appointment_date, appointment_time, notes, status } = req.body;
+
+      // Validate required fields
+      if (!user_id || !service_id || !stylist_id || !appointment_date || !appointment_time) {
+        req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+        return res.redirect('/admin/appointments/add');
+      }
+
+      // Check stylist availability
+      const isAvailable = await Appointment.checkStylistAvailability(stylist_id, appointment_date, appointment_time);
+      if (!isAvailable) {
+        req.flash('error', 'Stylist đã có lịch hẹn vào thời gian này');
+        return res.redirect('/admin/appointments/add');
+      }
+
+      // Create appointment
+      await Appointment.create({
+        user_id,
+        service_id,
+        stylist_id,
+        appointment_date,
+        appointment_time,
+        notes: notes || '',
+        status: status || 'pending'
+      });
+
+      req.flash('success', 'Thêm lịch hẹn thành công!');
+      res.redirect('/admin/appointments');
+    } catch (error) {
+      console.error('Error in postAddAppointment:', error);
+      req.flash('error', 'Có lỗi xảy ra khi thêm lịch hẹn');
+      res.redirect('/admin/appointments/add');
+    }
+  }
+
+  // Hiển thị form sửa lịch hẹn
+  static async getEditAppointment(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { id } = req.params;
+      const appointment = await Appointment.findById(id);
+      
+      if (!appointment) {
+        req.flash('error', 'Không tìm thấy lịch hẹn');
+        return res.redirect('/admin/appointments');
+      }
+
+      const services = await Service.findAll();
+      const stylists = await Stylist.findActive();
+      const users = await User.findAll();
+      
+      res.render('admin/appointments/edit', {
+        title: 'Sửa lịch hẹn',
+        user: req.session.user,
+        appointment,
+        services,
+        stylists,
+        users
+      });
+    } catch (error) {
+      console.error('Error in getEditAppointment:', error);
+      res.status(500).render('error', { 
+        message: 'Có lỗi xảy ra khi tải form sửa lịch hẹn',
+        error: error 
+      });
+    }
+  }
+
+  // Xử lý sửa lịch hẹn
+  static async postEditAppointment(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { id } = req.params;
+      const { user_id, service_id, stylist_id, appointment_date, appointment_time, notes, status } = req.body;
+
+      // Validate required fields
+      if (!user_id || !service_id || !stylist_id || !appointment_date || !appointment_time) {
+        req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+        return res.redirect(`/admin/appointments/edit/${id}`);
+      }
+
+      // Check if appointment exists
+      const existingAppointment = await Appointment.findById(id);
+      if (!existingAppointment) {
+        req.flash('error', 'Không tìm thấy lịch hẹn');
+        return res.redirect('/admin/appointments');
+      }
+
+      // Check stylist availability (exclude current appointment)
+      const isAvailable = await Appointment.checkStylistAvailability(stylist_id, appointment_date, appointment_time);
+      if (!isAvailable && (stylist_id != existingAppointment.stylist_id || 
+          appointment_date != existingAppointment.appointment_date || 
+          appointment_time != existingAppointment.appointment_time)) {
+        req.flash('error', 'Stylist đã có lịch hẹn vào thời gian này');
+        return res.redirect(`/admin/appointments/edit/${id}`);
+      }
+
+      // Update appointment
+      await Appointment.update(id, {
+        user_id,
+        service_id,
+        stylist_id,
+        appointment_date,
+        appointment_time,
+        notes: notes || '',
+        status: status || 'pending'
+      });
+
+      req.flash('success', 'Cập nhật lịch hẹn thành công!');
+      res.redirect('/admin/appointments');
+    } catch (error) {
+      console.error('Error in postEditAppointment:', error);
+      req.flash('error', 'Có lỗi xảy ra khi cập nhật lịch hẹn');
+      res.redirect(`/admin/appointments/edit/${req.params.id}`);
+    }
+  }
+
   // Xóa appointment
   static async deleteAppointment(req, res) {
     try {
@@ -198,6 +370,12 @@ class AdminController {
       }
 
       const { id } = req.params;
+      
+      const appointment = await Appointment.findById(id);
+      if (!appointment) {
+        req.flash('error', 'Không tìm thấy lịch hẹn');
+        return res.redirect('/admin/appointments');
+      }
       
       await Appointment.delete(id);
       
