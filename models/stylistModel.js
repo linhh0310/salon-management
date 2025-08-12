@@ -5,12 +5,13 @@ class Stylist {
   static async create(stylistData) {
     const { name, phone, email, specialization, experience, status, bio } = stylistData;
     const query = `
-      INSERT INTO stylists (name, phone, email, specialization, experience, status, bio, created_at) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+      INSERT INTO stylists (name, phone, email, specialization, experience, status, bio, is_active, created_at) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
     `;
     
     try {
-      const [result] = await db.execute(query, [name, phone, email, specialization, experience, status, bio]);
+      const isActive = status === 'active' ? 1 : 0;
+      const [result] = await db.execute(query, [name, phone, email, specialization, experience, status, bio, isActive]);
       return result.insertId;
     } catch (error) {
       throw error;
@@ -70,12 +71,13 @@ class Stylist {
     const { name, phone, email, specialization, experience, status, bio } = stylistData;
     const query = `
       UPDATE stylists 
-      SET name = ?, phone = ?, email = ?, specialization = ?, experience = ?, status = ?, bio = ?, updated_at = NOW()
+      SET name = ?, phone = ?, email = ?, specialization = ?, experience = ?, status = ?, bio = ?, is_active = ?, updated_at = NOW()
       WHERE id = ?
     `;
     
     try {
-      const [result] = await db.execute(query, [name, phone, email, specialization, experience, status, bio, id]);
+      const isActive = status === 'active' ? 1 : 0;
+      const [result] = await db.execute(query, [name, phone, email, specialization, experience, status, bio, isActive, id]);
       return result.affectedRows > 0;
     } catch (error) {
       throw error;

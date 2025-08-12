@@ -809,8 +809,8 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="status-badge status-<%= stylist.status %>">
-                                            <% if (stylist.status === 'active') { %>
+                                        <span class="status-badge status-<%= stylist.is_active ? 'active' : 'inactive' %>">
+                                            <% if (stylist.is_active) { %>
                                                 <i class="fas fa-check-circle"></i> Đang làm việc
                                             <% } else { %>
                                                 <i class="fas fa-pause-circle"></i> Tạm nghỉ

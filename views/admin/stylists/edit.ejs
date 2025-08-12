@@ -501,7 +501,7 @@
                         <p><strong>Chuyên môn:</strong> <%= stylist.specialization || 'Chưa cập nhật' %></p>
                         <p><strong>Kinh nghiệm:</strong> <%= stylist.experience || 0 %> năm</p>
                         <p><strong>Trạng thái:</strong> 
-                            <% if (stylist.status === 'active') { %>
+                            <% if (stylist.is_active) { %>
                                 <span style="color: #27ae60;">Đang làm việc</span>
                             <% } else { %>
                                 <span style="color: #e74c3c;">Tạm nghỉ</span>
@@ -549,8 +549,8 @@
                             <div class="form-group">
                                 <label for="status" class="form-label">Trạng thái</label>
                                 <select id="status" name="status" class="form-select">
-                                    <option value="active" <%= stylist.status === 'active' ? 'selected' : '' %>>Đang làm việc</option>
-                                    <option value="inactive" <%= stylist.status === 'inactive' ? 'selected' : '' %>>Tạm nghỉ</option>
+                                    <option value="active" <%= stylist.is_active ? 'selected' : '' %>>Đang làm việc</option>
+                                    <option value="inactive" <%= !stylist.is_active ? 'selected' : '' %>>Tạm nghỉ</option>
                                 </select>
                             </div>
 

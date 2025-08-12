@@ -630,7 +630,11 @@ class AdminController {
       
       // Lọc theo trạng thái
       if (status) {
-        stylists = stylists.filter(stylist => stylist.status === status);
+        if (status === 'active') {
+          stylists = stylists.filter(stylist => stylist.is_active === 1);
+        } else if (status === 'inactive') {
+          stylists = stylists.filter(stylist => stylist.is_active === 0);
+        }
       }
 
       // Tìm kiếm
@@ -646,8 +650,8 @@ class AdminController {
       // Tính toán thống kê
       const stats = {
         total: stylists.length,
-        active: stylists.filter(s => s.status === 'active').length,
-        inactive: stylists.filter(s => s.status === 'inactive').length
+        active: stylists.filter(s => s.is_active === 1).length,
+        inactive: stylists.filter(s => s.is_active === 0).length
       };
 
       // Phân trang
