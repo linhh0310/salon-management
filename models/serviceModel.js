@@ -9,10 +9,16 @@ class Service {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     
+    console.log('🔍 Service.create - Query:', query);
+    console.log('📦 Service.create - Parameters:', [name, description, price, duration, category_id, is_active]);
+    
     try {
       const [result] = await db.execute(query, [name, description, price, duration, category_id, is_active]);
+      console.log('✅ Service.create - Result:', result);
       return result.insertId;
     } catch (error) {
+      console.error('❌ Service.create - Error:', error);
+      console.error('📋 Error details:', error.message);
       throw error;
     }
   }

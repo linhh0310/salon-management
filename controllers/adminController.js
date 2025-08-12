@@ -481,12 +481,17 @@ class AdminController {
   // Xử lý thêm service
   static async postAddService(req, res) {
     try {
+      console.log('🔍 Bắt đầu xử lý thêm dịch vụ...');
+      console.log('📝 Request body:', req.body);
+      
       if (!req.session.user || req.session.user.role !== 'admin') {
+        console.log('❌ Không phải admin, redirect to login');
         return res.redirect('/login');
       }
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('❌ Validation errors:', errors.array());
         const categories = await Category.findAll();
         return res.render('admin/services/add', {
           title: 'Thêm dịch vụ mới',
@@ -498,26 +503,32 @@ class AdminController {
       }
 
       const { name, description, price, duration, category_id, is_active } = req.body;
+      console.log('📋 Dữ liệu đã parse:', { name, description, price, duration, category_id, is_active });
       
-      await Service.create({ 
+      const serviceData = { 
         name, 
         description, 
         price, 
         duration, 
         category_id: category_id || null,
         is_active: is_active === 'true' ? 1 : (is_active === 'false' ? 0 : 1)
-      });
+      };
+      console.log('📦 Dữ liệu gửi đến Service.create:', serviceData);
+      
+      const newServiceId = await Service.create(serviceData);
+      console.log('✅ Thêm dịch vụ thành công, ID:', newServiceId);
       
       req.flash('success', 'Thêm dịch vụ thành công!');
       res.redirect('/admin/services');
     } catch (error) {
-      console.error('Error in postAddService:', error);
+      console.error('❌ Error in postAddService:', error);
+      console.error('📋 Error details:', error.message);
       const categories = await Category.findAll();
       res.render('admin/services/add', {
         title: 'Thêm dịch vụ mới',
         user: req.session.user,
         categories,
-        errors: [{ msg: 'Có lỗi xảy ra khi thêm dịch vụ' }],
+        errors: [{ msg: 'Có lỗi xảy ra khi thêm dịch vụ: ' + error.message }],
         ...req.body // Giữ lại dữ liệu đã nhập
       });
     }
