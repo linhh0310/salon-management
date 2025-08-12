@@ -50,6 +50,14 @@ class CartManager {
 
     // Thêm sản phẩm vào giỏ hàng
     addToCart(productId, productName, productPrice, productImage) {
+        // Kiểm tra xem user đã đăng nhập chưa
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (!currentUser.id) {
+            alert('Vui lòng đăng nhập để thêm vào giỏ hàng!');
+            window.location.href = '/login';
+            return null;
+        }
+        
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         
         const existingItem = cart.find(item => item.id === productId);

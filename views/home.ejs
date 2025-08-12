@@ -939,6 +939,14 @@
         }
         
         function addToCart(productId) {
+            // Kiểm tra xem user đã đăng nhập chưa
+            var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser.id) {
+                alert('Vui lòng đăng nhập để thêm vào giỏ hàng!');
+                window.location.href = '/login';
+                return;
+            }
+            
             alert('Đã thêm vào giỏ hàng!');
             console.log('Thêm vào giỏ hàng sản phẩm ID:', productId);
         }
