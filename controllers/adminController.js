@@ -395,12 +395,58 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      const services = await Service.findAll();
-      
+      const { status, search, category_id, page = 1 } = req.query;
+      const limit = 10;
+      const offset = (page - 1) * limit;
+
+      let services = await Service.findAll();
+      const categories = await Category.findAll();
+
+      // Lọc theo trạng thái
+      if (status) {
+        if (status === 'active') {
+          services = services.filter(service => service.is_active === 1);
+        } else if (status === 'inactive') {
+          services = services.filter(service => service.is_active === 0);
+        }
+      }
+
+      // Lọc theo danh mục
+      if (category_id) {
+        services = services.filter(service => service.category_id == category_id);
+      }
+
+      // Tìm kiếm
+      if (search) {
+        services = services.filter(service =>
+          service.name?.toLowerCase().includes(search.toLowerCase()) ||
+          service.description?.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      // Tính toán thống kê
+      const stats = {
+        total: services.length,
+        active: services.filter(s => s.is_active === 1).length,
+        inactive: services.filter(s => s.is_active === 0).length
+      };
+
+      // Phân trang
+      const totalPages = Math.ceil(services.length / limit);
+      const currentPage = parseInt(page);
+      const paginatedServices = services.slice(offset, offset + limit);
+
       res.render('admin/services', {
         title: 'Quản lý dịch vụ',
         user: req.session.user,
-        services
+        services: paginatedServices,
+        categories,
+        stats,
+        currentPage,
+        totalPages,
+        status,
+        search,
+        category_id
       });
     } catch (error) {
       console.error('Error in getServices:', error);
@@ -412,15 +458,24 @@ class AdminController {
   }
 
   // Hiển thị form thêm service
-  static getAddService(req, res) {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-      return res.redirect('/login');
-    }
+  static async getAddService(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
 
-    res.render('admin/addService', {
-      title: 'Thêm dịch vụ mới',
-      user: req.session.user
-    });
+      const categories = await Category.findAll();
+
+      res.render('admin/services/add', {
+        title: 'Thêm dịch vụ mới',
+        user: req.session.user,
+        categories
+      });
+    } catch (error) {
+      console.error('Error in getAddService:', error);
+      req.flash('error', 'Có lỗi xảy ra khi tải form thêm dịch vụ');
+      res.redirect('/admin/services');
+    }
   }
 
   // Xử lý thêm service
@@ -432,25 +487,36 @@ class AdminController {
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.render('admin/addService', {
+        const categories = await Category.findAll();
+        return res.render('admin/services/add', {
           title: 'Thêm dịch vụ mới',
           user: req.session.user,
+          categories,
           errors: errors.array(),
           ...req.body // Giữ lại dữ liệu đã nhập
         });
       }
 
-      const { name, description, price, duration, category } = req.body;
+      const { name, description, price, duration, category_id, is_active } = req.body;
       
-      await Service.create({ name, description, price, duration, category });
+      await Service.create({ 
+        name, 
+        description, 
+        price, 
+        duration, 
+        category_id: category_id || null,
+        is_active: is_active === 'true' ? 1 : (is_active === 'false' ? 0 : 1)
+      });
       
       req.flash('success', 'Thêm dịch vụ thành công!');
       res.redirect('/admin/services');
     } catch (error) {
       console.error('Error in postAddService:', error);
-      res.render('admin/addService', {
+      const categories = await Category.findAll();
+      res.render('admin/services/add', {
         title: 'Thêm dịch vụ mới',
         user: req.session.user,
+        categories,
         errors: [{ msg: 'Có lỗi xảy ra khi thêm dịch vụ' }],
         ...req.body // Giữ lại dữ liệu đã nhập
       });
@@ -466,16 +532,18 @@ class AdminController {
 
       const { id } = req.params;
       const service = await Service.findById(id);
+      const categories = await Category.findAll();
       
       if (!service) {
         req.flash('error', 'Không tìm thấy dịch vụ');
         return res.redirect('/admin/services');
       }
 
-      res.render('admin/editService', {
+      res.render('admin/services/edit', {
         title: 'Chỉnh sửa dịch vụ',
         user: req.session.user,
-        service
+        service,
+        categories
       });
     } catch (error) {
       console.error('Error in getEditService:', error);
@@ -495,19 +563,28 @@ class AdminController {
       if (!errors.isEmpty()) {
         const { id } = req.params;
         const service = await Service.findById(id);
+        const categories = await Category.findAll();
         
-        return res.render('admin/editService', {
+        return res.render('admin/services/edit', {
           title: 'Chỉnh sửa dịch vụ',
           user: req.session.user,
           service,
+          categories,
           errors: errors.array()
         });
       }
 
       const { id } = req.params;
-      const { name, description, price, duration, category } = req.body;
+      const { name, description, price, duration, category_id, is_active } = req.body;
       
-      await Service.update(id, { name, description, price, duration, category });
+      await Service.update(id, { 
+        name, 
+        description, 
+        price, 
+        duration, 
+        category_id: category_id || null,
+        is_active: is_active === 'true' ? 1 : (is_active === 'false' ? 0 : 1)
+      });
       
       req.flash('success', 'Cập nhật dịch vụ thành công!');
       res.redirect('/admin/services');

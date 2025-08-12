@@ -3,14 +3,14 @@ const db = require('../config/db');
 class Service {
   // Tạo service mới
   static async create(serviceData) {
-    const { name, description, price, duration, category } = serviceData;
+    const { name, description, price, duration, category_id, is_active } = serviceData;
     const query = `
-      INSERT INTO services (name, description, price, duration, category) 
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO services (name, description, price, duration, category_id, is_active) 
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
     
     try {
-      const [result] = await db.execute(query, [name, description, price, duration, category]);
+      const [result] = await db.execute(query, [name, description, price, duration, category_id, is_active]);
       return result.insertId;
     } catch (error) {
       throw error;
@@ -19,7 +19,12 @@ class Service {
 
   // Tìm service theo ID
   static async findById(id) {
-    const query = 'SELECT * FROM services WHERE id = ?';
+    const query = `
+      SELECT s.*, c.name as category_name 
+      FROM services s 
+      LEFT JOIN categories c ON s.category_id = c.id 
+      WHERE s.id = ?
+    `;
     
     try {
       const [rows] = await db.execute(query, [id]);
@@ -31,7 +36,12 @@ class Service {
 
   // Lấy tất cả services
   static async findAll() {
-    const query = 'SELECT * FROM services ORDER BY name';
+    const query = `
+      SELECT s.*, c.name as category_name 
+      FROM services s 
+      LEFT JOIN categories c ON s.category_id = c.id 
+      ORDER BY s.name
+    `;
     
     try {
       const [rows] = await db.execute(query);
@@ -42,11 +52,17 @@ class Service {
   }
 
   // Lấy services theo category
-  static async findByCategory(category) {
-    const query = 'SELECT * FROM services WHERE category = ? ORDER BY name';
+  static async findByCategory(categoryId) {
+    const query = `
+      SELECT s.*, c.name as category_name 
+      FROM services s 
+      LEFT JOIN categories c ON s.category_id = c.id 
+      WHERE s.category_id = ? 
+      ORDER BY s.name
+    `;
     
     try {
-      const [rows] = await db.execute(query, [category]);
+      const [rows] = await db.execute(query, [categoryId]);
       return rows;
     } catch (error) {
       throw error;
@@ -55,15 +71,15 @@ class Service {
 
   // Cập nhật service
   static async update(id, serviceData) {
-    const { name, description, price, duration, category } = serviceData;
+    const { name, description, price, duration, category_id, is_active } = serviceData;
     const query = `
       UPDATE services 
-      SET name = ?, description = ?, price = ?, duration = ?, category = ?
+      SET name = ?, description = ?, price = ?, duration = ?, category_id = ?, is_active = ?
       WHERE id = ?
     `;
     
     try {
-      const [result] = await db.execute(query, [name, description, price, duration, category, id]);
+      const [result] = await db.execute(query, [name, description, price, duration, category_id, is_active, id]);
       return result.affectedRows > 0;
     } catch (error) {
       throw error;
@@ -84,11 +100,11 @@ class Service {
 
   // Lấy danh sách categories
   static async getCategories() {
-    const query = 'SELECT DISTINCT category FROM services WHERE category IS NOT NULL ORDER BY category';
+    const query = 'SELECT * FROM categories ORDER BY name';
     
     try {
       const [rows] = await db.execute(query);
-      return rows.map(row => row.category);
+      return rows;
     } catch (error) {
       throw error;
     }

@@ -18,7 +18,7 @@ const serviceValidation = [
   body('name').notEmpty().withMessage('Tên dịch vụ không được để trống'),
   body('price').isNumeric().withMessage('Giá phải là số'),
   body('duration').isNumeric().withMessage('Thời gian phải là số'),
-  body('category').notEmpty().withMessage('Danh mục không được để trống')
+  body('category_id').notEmpty().withMessage('Danh mục không được để trống')
 ];
 
 // Validation cho stylist

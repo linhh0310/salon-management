@@ -717,8 +717,8 @@
                                 </div>
                             </div>
                             <div class="filter-group">
-                                <label for="category">Danh mục</label>
-                                <select id="category" name="category">
+                                <label for="category_id">Danh mục</label>
+                                <select id="category_id" name="category_id">
                                     <option value="">Tất cả danh mục</option>
                                     <% categories.forEach(function(category) { %>
                                         <option value="<%= category.id %>" <%= category_id == category.id ? 'selected' : '' %>><%= category.name %></option>
@@ -781,7 +781,7 @@
                                             <strong><%= service.name %></strong>
                                         </div>
                                     </td>
-                                    <td><%= service.category_name %></td>
+                                    <td><%= service.category_name || 'Chưa phân loại' %></td>
                                     <td>
                                         <div>
                                             <%= service.description %>
@@ -794,8 +794,8 @@
                                         <div class="duration-display"><%= service.duration %> phút</div>
                                     </td>
                                     <td>
-                                        <span class="status-badge status-<%= service.status %>">
-                                            <% if (service.status === 'active') { %>
+                                        <span class="status-badge status-<%= service.is_active ? 'active' : 'inactive' %>">
+                                            <% if (service.is_active) { %>
                                                 <i class="fas fa-check-circle"></i> Đang hoạt động
                                             <% } else { %>
                                                 <i class="fas fa-pause-circle"></i> Tạm ngưng
@@ -836,7 +836,7 @@
                     <% if (totalPages > 1) { %>
                     <div class="pagination">
                         <% if (currentPage > 1) { %>
-                            <a href="/admin/services?page=<%= currentPage - 1 %><%= status ? '&status=' + status : '' %><%= category_id ? '&category=' + category_id : '' %><%= search ? '&search=' + search : '' %>">
+                            <a href="/admin/services?page=<%= currentPage - 1 %><%= status ? '&status=' + status : '' %><%= category_id ? '&category_id=' + category_id : '' %><%= search ? '&search=' + search : '' %>">
                                 <i class="fas fa-chevron-left"></i> Trước
                             </a>
                         <% } %>
@@ -845,12 +845,12 @@
                             <% if (i === currentPage) { %>
                                 <a href="#" class="active"><%= i %></a>
                             <% } else { %>
-                                <a href="/admin/services?page=<%= i %><%= status ? '&status=' + status : '' %><%= category_id ? '&category=' + category_id : '' %><%= search ? '&search=' + search : '' %>"><%= i %></a>
+                                <a href="/admin/services?page=<%= i %><%= status ? '&status=' + status : '' %><%= category_id ? '&category_id=' + category_id : '' %><%= search ? '&search=' + search : '' %>"><%= i %></a>
                             <% } %>
                         <% } %>
                         
                         <% if (currentPage < totalPages) { %>
-                            <a href="/admin/services?page=<%= currentPage + 1 %><%= status ? '&status=' + status : '' %><%= category_id ? '&category=' + category_id : '' %><%= search ? '&search=' + search : '' %>">
+                            <a href="/admin/services?page=<%= currentPage + 1 %><%= status ? '&status=' + status : '' %><%= category_id ? '&category_id=' + category_id : '' %><%= search ? '&search=' + search : '' %>">
                                 Sau <i class="fas fa-chevron-right"></i>
                             </a>
                         <% } %>
@@ -873,7 +873,7 @@
             this.form.submit();
         });
 
-        document.getElementById('category').addEventListener('change', function() {
+        document.getElementById('category_id').addEventListener('change', function() {
             this.form.submit();
         });
 
