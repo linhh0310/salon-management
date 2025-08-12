@@ -269,6 +269,14 @@
     
     <script>
         function buyProduct(productId) {
+            // Kiểm tra xem user đã đăng nhập chưa
+            var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser.id) {
+                alert('Vui lòng đăng nhập để mua hàng!');
+                window.location.href = '/login';
+                return;
+            }
+            
             // Hiển thị thông báo xác nhận
             if (confirm('Bạn có muốn mua sản phẩm này không?')) {
                 // Gọi API để giảm số lượng
@@ -282,8 +290,15 @@
                         amount: 1
                     })
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(function(response) {
+                    if (response.status === 401) {
+                        alert('Vui lòng đăng nhập để mua hàng!');
+                        window.location.href = '/login';
+                        throw new Error('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
                     if (data.success) {
                         alert('Mua hàng thành công!');
                         location.reload(); // Tải lại trang để cập nhật số lượng
@@ -291,7 +306,10 @@
                         alert('Lỗi: ' + data.message);
                     }
                 })
-                .catch(error => {
+                .catch(function(error) {
+                    if (error.message === 'Unauthorized') {
+                        return; // Đã xử lý redirect
+                    }
                     console.error('Error:', error);
                     alert('Có lỗi xảy ra khi mua hàng');
                 });

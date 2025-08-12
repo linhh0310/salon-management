@@ -191,6 +191,14 @@ class ProductController {
     // API: Giảm số lượng sản phẩm (khi bán)
     static async apiDecreaseQuantity(req, res) {
         try {
+            // Kiểm tra xem user đã đăng nhập chưa
+            if (!req.session.user) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Vui lòng đăng nhập để mua hàng' 
+                });
+            }
+
             const { productId, amount } = req.body;
             
             if (!productId || !amount) {

@@ -315,6 +315,14 @@
     
     <script>
         function buyProduct() {
+            // Kiểm tra xem user đã đăng nhập chưa
+            var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser.id) {
+                alert('Vui lòng đăng nhập để mua hàng!');
+                window.location.href = '/login';
+                return;
+            }
+            
             var quantity = parseInt(document.getElementById('quantity').value);
             var productId = <%- product.id %>;
             
@@ -340,6 +348,11 @@
                     })
                 })
                 .then(function(response) { 
+                    if (response.status === 401) {
+                        alert('Vui lòng đăng nhập để mua hàng!');
+                        window.location.href = '/login';
+                        throw new Error('Unauthorized');
+                    }
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
@@ -354,6 +367,9 @@
                     }
                 })
                 .catch(function(error) {
+                    if (error.message === 'Unauthorized') {
+                        return; // Đã xử lý redirect
+                    }
                     console.error('Error:', error);
                     alert('Có lỗi xảy ra khi mua hàng. Vui lòng thử lại.');
                 });

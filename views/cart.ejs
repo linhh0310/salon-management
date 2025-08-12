@@ -640,6 +640,14 @@
         }
 
         function processCheckout() {
+            // Kiểm tra xem user đã đăng nhập chưa
+            var currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser.id) {
+                alert('Vui lòng đăng nhập để đặt hàng!');
+                window.location.href = '/login';
+                return;
+            }
+            
             var cart = JSON.parse(localStorage.getItem('cart')) || [];
             if (cart.length === 0) {
                 alert('Giỏ hàng trống!');
