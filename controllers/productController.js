@@ -114,8 +114,15 @@ class ProductController {
     static async getBestSellingProducts(req, res) {
         try {
             const products = await Product.getBestSelling();
+            
+            // Parse features từ JSON string thành array
+            const productsWithParsedFeatures = products.map(product => ({
+                ...product,
+                features: product.features ? JSON.parse(product.features) : []
+            }));
+            
             res.render('bestSellingProducts', { 
-                products,
+                products: productsWithParsedFeatures,
                 user: req.session.user || null,
                 title: 'Sản phẩm bán chạy'
             });

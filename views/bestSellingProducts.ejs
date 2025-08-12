@@ -240,7 +240,7 @@
                                     Đã bán: <%= product.sales_count || 0 %>
                                 </div>
                             </div>
-                            <% if (product.features && product.features.length > 0) { %>
+                            <% if (product.features && Array.isArray(product.features) && product.features.length > 0) { %>
                                 <ul class="product-features">
                                     <% product.features.slice(0, 3).forEach(function(feature) { %>
                                         <li><%= feature %></li>
