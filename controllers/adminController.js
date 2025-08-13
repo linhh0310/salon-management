@@ -1322,7 +1322,7 @@ class AdminController {
         FROM orders o
         LEFT JOIN users u ON o.user_id = u.id
         ${whereClause}
-      `, queryParams);
+      `, whereConditions.length > 0 ? queryParams : []);
 
       const totalOrders = countResult[0].total;
       const totalPages = Math.ceil(totalOrders / limit);
@@ -1336,7 +1336,7 @@ class AdminController {
         ${whereClause}
         ORDER BY o.created_at DESC
         LIMIT ? OFFSET ?
-      `, [...queryParams, parseInt(limit), parseInt(offset)]);
+      `, whereConditions.length > 0 ? [...queryParams, parseInt(limit), parseInt(offset)] : [parseInt(limit), parseInt(offset)]);
 
       // Get statistics
       const [statsResult] = await db.execute(`
