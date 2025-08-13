@@ -1335,8 +1335,8 @@ class AdminController {
         LEFT JOIN users u ON o.user_id = u.id
         ${whereClause}
         ORDER BY o.created_at DESC
-        LIMIT ? OFFSET ?
-      `, whereConditions.length > 0 ? [...queryParams, parseInt(limit), parseInt(offset)] : [parseInt(limit), parseInt(offset)]);
+        LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}
+      `, whereConditions.length > 0 ? queryParams : []);
 
       // Get statistics
       const [statsResult] = await db.execute(`
