@@ -1476,7 +1476,7 @@ class AdminController {
       }
 
       // Lấy danh sách khách hàng và sản phẩm
-      const [customers] = await db.execute('SELECT id, name, email FROM users WHERE role = "user" ORDER BY name');
+      const [customers] = await db.execute('SELECT id, name, email FROM users WHERE role = "customer" ORDER BY name');
       const [products] = await db.execute('SELECT id, name, price, quantity FROM products WHERE is_active = 1 ORDER BY name');
 
       res.render('admin/orders/add', {
@@ -1573,7 +1573,7 @@ class AdminController {
       `, [id]);
 
       // Lấy danh sách khách hàng và sản phẩm
-      const [customers] = await db.execute('SELECT id, name, email FROM users WHERE role = "user" ORDER BY name');
+      const [customers] = await db.execute('SELECT id, name, email FROM users WHERE role = "customer" ORDER BY name');
       const [products] = await db.execute('SELECT id, name, price, quantity FROM products WHERE is_active = 1 ORDER BY name');
 
       res.render('admin/orders/edit', {
