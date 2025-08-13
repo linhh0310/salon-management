@@ -1294,7 +1294,7 @@ class AdminController {
       let queryParams = [];
 
       if (search) {
-        whereConditions.push(`(o.id LIKE ? OR c.name LIKE ? OR c.email LIKE ?)`);
+        whereConditions.push(`(o.id LIKE ? OR u.name LIKE ? OR u.email LIKE ?)`);
         queryParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
       }
 
@@ -1319,7 +1319,7 @@ class AdminController {
       const [countResult] = await db.execute(`
         SELECT COUNT(*) as total
         FROM orders o
-        LEFT JOIN customers c ON o.customer_id = c.id
+        LEFT JOIN users u ON o.user_id = u.id
         ${whereClause}
       `, queryParams);
 
@@ -1328,10 +1328,10 @@ class AdminController {
 
       // Get orders with pagination
       const [orders] = await db.execute(`
-        SELECT o.*, c.name as customer_name,
+        SELECT o.*, u.name as customer_name,
                (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) as total_items
         FROM orders o
-        LEFT JOIN customers c ON o.customer_id = c.id
+        LEFT JOIN users u ON o.user_id = u.id
         ${whereClause}
         ORDER BY o.created_at DESC
         LIMIT ? OFFSET ?
@@ -1476,7 +1476,7 @@ class AdminController {
       }
 
       // Lấy danh sách khách hàng và sản phẩm
-      const [customers] = await db.execute('SELECT id, name, email FROM customers ORDER BY name');
+      const [customers] = await db.execute('SELECT id, name, email FROM users WHERE role = "user" ORDER BY name');
       const [products] = await db.execute('SELECT id, name, price, quantity FROM products WHERE is_active = 1 ORDER BY name');
 
       res.render('admin/orders/add', {
@@ -1509,7 +1509,7 @@ class AdminController {
 
       // Tạo đơn hàng mới
       const [orderResult] = await db.execute(`
-        INSERT INTO orders (customer_id, total_amount, status, notes, created_at, updated_at)
+        INSERT INTO orders (user_id, total_amount, status, notes, created_at, updated_at)
         VALUES (?, ?, ?, ?, NOW(), NOW())
       `, [customer_id, total_amount, status || 'pending', notes || null]);
 
@@ -1551,9 +1551,9 @@ class AdminController {
 
       // Lấy thông tin đơn hàng
       const [orders] = await db.execute(`
-        SELECT o.*, c.name as customer_name, c.email as customer_email
+        SELECT o.*, u.name as customer_name, u.email as customer_email
         FROM orders o
-        LEFT JOIN customers c ON o.customer_id = c.id
+        LEFT JOIN users u ON o.user_id = u.id
         WHERE o.id = ?
       `, [id]);
 
@@ -1573,7 +1573,7 @@ class AdminController {
       `, [id]);
 
       // Lấy danh sách khách hàng và sản phẩm
-      const [customers] = await db.execute('SELECT id, name, email FROM customers ORDER BY name');
+      const [customers] = await db.execute('SELECT id, name, email FROM users WHERE role = "user" ORDER BY name');
       const [products] = await db.execute('SELECT id, name, price, quantity FROM products WHERE is_active = 1 ORDER BY name');
 
       res.render('admin/orders/edit', {
@@ -1610,7 +1610,7 @@ class AdminController {
       // Cập nhật đơn hàng
       await db.execute(`
         UPDATE orders 
-        SET customer_id = ?, total_amount = ?, status = ?, notes = ?, updated_at = NOW()
+        SET user_id = ?, total_amount = ?, status = ?, notes = ?, updated_at = NOW()
         WHERE id = ?
       `, [customer_id, total_amount, status || 'pending', notes || null, id]);
 
