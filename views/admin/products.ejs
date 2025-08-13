@@ -772,10 +772,10 @@
                             </div>
                             <div class="filter-group">
                                 <label for="category">Danh mục</label>
-                                <select id="category" name="category">
+                                <select id="category_id" name="category_id">
                                     <option value="">Tất cả danh mục</option>
                                     <% categories.forEach(function(category) { %>
-                                        <option value="<%= category.id %>" <%= category.id == selectedCategory ? 'selected' : '' %>>
+                                        <option value="<%= category.id %>" <%= category_id == category.id ? 'selected' : '' %>>
                                             <%= category.name %>
                                         </option>
                                     <% }); %>
@@ -843,13 +843,13 @@
                                     <td><%= product.category_name || 'Chưa phân loại' %></td>
                                     <td class="price">₫<%= product.price.toLocaleString('vi-VN') %></td>
                                     <td>
-                                        <span class="stock-badge stock-<%= product.stock > 10 ? 'high' : product.stock > 5 ? 'medium' : 'low' %>">
-                                            <%= product.stock %> cái
+                                        <span class="stock-badge stock-<%= product.quantity > 10 ? 'high' : product.quantity > 5 ? 'medium' : 'low' %>">
+                                            <%= product.quantity %> cái
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="status-badge status-<%= product.status %>">
-                                            <% if (product.status === 'active') { %>
+                                        <span class="status-badge status-<%= product.is_active ? 'active' : 'inactive' %>">
+                                            <% if (product.is_active) { %>
                                                 <i class="fas fa-check-circle"></i> Đang bán
                                             <% } else { %>
                                                 <i class="fas fa-pause-circle"></i> Tạm ngưng
@@ -890,7 +890,7 @@
                     <% if (totalPages > 1) { %>
                     <div class="pagination">
                         <% if (currentPage > 1) { %>
-                            <a href="/admin/products?page=<%= currentPage - 1 %><%= status ? '&status=' + status : '' %><%= search ? '&search=' + search : '' %><%= selectedCategory ? '&category=' + selectedCategory : '' %>">
+                            <a href="/admin/products?page=<%= currentPage - 1 %><%= status ? '&status=' + status : '' %><%= search ? '&search=' + search : '' %><%= category_id ? '&category_id=' + category_id : '' %>">
                                 <i class="fas fa-chevron-left"></i> Trước
                             </a>
                         <% } %>
@@ -899,12 +899,12 @@
                             <% if (i === currentPage) { %>
                                 <a href="#" class="active"><%= i %></a>
                             <% } else { %>
-                                <a href="/admin/products?page=<%= i %><%= status ? '&status=' + status : '' %><%= search ? '&search=' + search : '' %><%= selectedCategory ? '&category=' + selectedCategory : '' %>"><%= i %></a>
+                                <a href="/admin/products?page=<%= i %><%= status ? '&status=' + status : '' %><%= search ? '&search=' + search : '' %><%= category_id ? '&category_id=' + category_id : '' %>"><%= i %></a>
                             <% } %>
                         <% } %>
                         
                         <% if (currentPage < totalPages) { %>
-                            <a href="/admin/products?page=<%= currentPage + 1 %><%= status ? '&status=' + status : '' %><%= search ? '&search=' + search : '' %><%= selectedCategory ? '&category=' + selectedCategory : '' %>">
+                            <a href="/admin/products?page=<%= currentPage + 1 %><%= status ? '&status=' + status : '' %><%= search ? '&search=' + search : '' %><%= category_id ? '&category_id=' + category_id : '' %>">
                                 Sau <i class="fas fa-chevron-right"></i>
                             </a>
                         <% } %>
@@ -927,7 +927,7 @@
             this.form.submit();
         });
 
-        document.getElementById('category').addEventListener('change', function() {
+        document.getElementById('category_id').addEventListener('change', function() {
             this.form.submit();
         });
 
