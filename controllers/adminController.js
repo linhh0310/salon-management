@@ -1692,8 +1692,12 @@ class AdminController {
       let queryParams = [];
 
       if (status) {
-        whereConditions.push(`r.status = ?`);
-        queryParams.push(status);
+        if (status === 'approved') {
+          whereConditions.push(`r.is_active = 1`);
+        } else if (status === 'rejected') {
+          whereConditions.push(`r.is_active = 0`);
+        }
+        // pending không cần filter vì tất cả reviews mới đều là pending
       }
 
       if (type) {
@@ -1734,9 +1738,9 @@ class AdminController {
       const [statsResult] = await db.execute(`
         SELECT 
           COUNT(*) as total,
-          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-          SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
-          SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+          SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as approved,
+          SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as rejected,
+          0 as pending
         FROM reviews
       `);
 
@@ -1873,7 +1877,7 @@ class AdminController {
       
       const [result] = await db.execute(`
         UPDATE reviews 
-        SET status = 'approved', updated_at = NOW()
+        SET is_active = 1, updated_at = NOW()
         WHERE id = ?
       `, [id]);
 
@@ -1899,7 +1903,7 @@ class AdminController {
       
       const [result] = await db.execute(`
         UPDATE reviews 
-        SET status = 'rejected', updated_at = NOW()
+        SET is_active = 0, updated_at = NOW()
         WHERE id = ?
       `, [id]);
 
