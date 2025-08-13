@@ -1287,7 +1287,8 @@ class AdminController {
       // Get query parameters
       const { search, status, from_date, to_date, page = 1 } = req.query;
       const limit = 10;
-      const offset = (page - 1) * limit;
+      const currentPage = parseInt(page) || 1;
+      const offset = (currentPage - 1) * limit;
 
       // Build query conditions
       let whereConditions = [];
@@ -1335,7 +1336,7 @@ class AdminController {
         ${whereClause}
         ORDER BY o.created_at DESC
         LIMIT ? OFFSET ?
-      `, [...queryParams, limit, offset]);
+      `, [...queryParams, parseInt(limit), parseInt(offset)]);
 
       // Get statistics
       const [statsResult] = await db.execute(`
@@ -1368,7 +1369,7 @@ class AdminController {
         status,
         from_date,
         to_date,
-        currentPage: parseInt(page),
+        currentPage: currentPage,
         totalPages,
         queryString
       });
