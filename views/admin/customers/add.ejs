@@ -7,184 +7,534 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .add-form {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
         }
         
-        .form-group {
-            margin-bottom: 20px;
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
         }
-        
-        .form-label {
-            display: block;
+
+        .sidebar-profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
             font-weight: 600;
-            color: #374151;
+            margin-bottom: 5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 0 20px 10px;
+            color: #bdc3c7;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item.active {
+            background: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .menu-item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .menu-arrow {
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            background: #f8f9fa;
+        }
+
+        /* Header */
+        .admin-header {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-website-btn {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .view-website-btn:hover {
+            background: #2980b9;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2c3e50;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Form Container */
+        .form-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
             margin-bottom: 8px;
+            font-size: 14px;
         }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+
+        .form-label.required::after {
+            content: " *";
+            color: #e74c3c;
         }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-        
+
+        .form-input,
+        .form-select,
         .form-textarea {
-            width: 100%;
             padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 16px;
-            min-height: 100px;
-            resize: vertical;
-            font-family: inherit;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
         }
-        
+
+        .form-input:focus,
+        .form-select:focus,
         .form-textarea:focus {
             outline: none;
-            border-color: #3b82f6;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
-        
-        .action-buttons {
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-buttons {
             display: flex;
-            gap: 10px;
+            gap: 15px;
+            justify-content: center;
             margin-top: 30px;
+            grid-column: 1 / -1;
         }
-        
+
         .btn {
             padding: 12px 24px;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-weight: 500;
-            font-size: 16px;
+            transition: all 0.3s ease;
         }
-        
-        .btn-save {
-            background: #10b981;
+
+        .btn-primary {
+            background: #3498db;
             color: white;
         }
-        
-        .btn-cancel {
-            background: #6b7280;
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
             color: white;
         }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
             margin-bottom: 20px;
-            display: none;
         }
-        
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
+
+        .info-box i {
+            margin-right: 8px;
         }
-        
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-        
-        .password-info {
-            background: #f3f4f6;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 8px;
-            font-size: 14px;
-            color: #6b7280;
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .admin-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
-        <%- include('../partials/sidebar') %>
-        
-        <!-- Main Content -->
-        <div class="admin-main">
-            <!-- Top Navigation -->
-            <div class="admin-header">
-                <div class="header-left">
-                    <button class="hamburger-menu" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="header-title">Thêm Khách hàng mới</div>
+        <div class="admin-sidebar">
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
                 </div>
-                <div class="header-right">
-                    <a href="/admin/customers" class="header-link">
-                        <i class="fas fa-arrow-left"></i>
-                        Quay lại
+                <div class="profile-name">Admin</div>
+                <div class="profile-status">
+                    <i class="fas fa-circle"></i>
+                    Online
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">MENU ADMIN</div>
+                    <a href="/admin" class="menu-item">
+                        <i class="fas fa-home"></i>
+                        Trang chủ
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/appointments" class="menu-item">
+                        <i class="fas fa-calendar"></i>
+                        Lịch hẹn
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/services" class="menu-item">
+                        <i class="fas fa-percentage"></i>
+                        Dịch vụ
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/stylists" class="menu-item">
+                        <i class="fas fa-user"></i>
+                        Stylist
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/products" class="menu-item">
+                        <i class="fas fa-shopping-bag"></i>
+                        Quản lý sản phẩm
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/orders" class="menu-item">
+                        <i class="fas fa-shopping-cart"></i>
+                        Đơn hàng
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/reviews" class="menu-item">
+                        <i class="fas fa-star"></i>
+                        Đánh giá
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/customers" class="menu-item active">
+                        <i class="fas fa-users"></i>
+                        Khách hàng
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <a href="/admin/contact" class="menu-item">
+                        <i class="fas fa-envelope"></i>
+                        Tin nhắn
+                        <i class="fas fa-chevron-right menu-arrow"></i>
                     </a>
                 </div>
             </div>
+        </div>
 
-            <!-- Content Area -->
-            <div class="admin-content">
-                <div class="content-header">
-                    <h1 class="content-title">Thêm Khách hàng mới</h1>
-                    <p class="content-subtitle">Tạo tài khoản khách hàng mới</p>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="admin-header">
+                <div class="header-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Thêm khách hàng</h1>
                 </div>
-                
-                <div class="add-form">
-                    <div id="alert" class="alert"></div>
-                    
-                    <form id="addCustomerForm">
-                        <div class="form-group">
-                            <label class="form-label">Họ tên *</label>
-                            <input type="text" class="form-input" name="name" required>
+                <div class="header-right">
+                    <a href="/" class="view-website-btn">
+                        <i class="fas fa-eye"></i>
+                        Xem website
+                    </a>
+                    <div class="admin-profile">
+                        <div class="admin-avatar">
+                            <i class="fas fa-user"></i>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Email *</label>
-                            <input type="email" class="form-input" name="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Số điện thoại</label>
-                            <input type="tel" class="form-input" name="phone">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Mật khẩu *</label>
-                            <input type="password" class="form-input" name="password" required minlength="6">
-                            <div class="password-info">
-                                <i class="fas fa-info-circle"></i>
-                                Mật khẩu phải có ít nhất 6 ký tự
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2 class="form-title">Thêm khách hàng mới</h2>
+                        <p class="form-subtitle">Nhập thông tin khách hàng mới</p>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Lưu ý:</strong> Vui lòng điền đầy đủ thông tin bắt buộc để thêm khách hàng mới.
+                    </div>
+
+                    <form method="POST" action="/admin/customers/add">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name" class="form-label required">Họ và tên</label>
+                                <input type="text" id="name" name="name" class="form-input" required 
+                                       placeholder="Nhập họ và tên khách hàng">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label required">Email</label>
+                                <input type="email" id="email" name="email" class="form-input" required 
+                                       placeholder="example@email.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone" class="form-label required">Số điện thoại</label>
+                                <input type="tel" id="phone" name="phone" class="form-input" required 
+                                       placeholder="0123456789">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address" class="form-label">Địa chỉ</label>
+                                <input type="text" id="address" name="address" class="form-input" 
+                                       placeholder="Nhập địa chỉ">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="birth_date" class="form-label">Ngày sinh</label>
+                                <input type="date" id="birth_date" name="birth_date" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gender" class="form-label">Giới tính</label>
+                                <select id="gender" name="gender" class="form-select">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="male">Nam</option>
+                                    <option value="female">Nữ</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="notes" class="form-label">Ghi chú</label>
+                                <textarea id="notes" name="notes" class="form-textarea" 
+                                          placeholder="Ghi chú về khách hàng (không bắt buộc)"></textarea>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Địa chỉ</label>
-                            <textarea class="form-textarea" name="address" placeholder="Nhập địa chỉ..."></textarea>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button type="submit" class="btn btn-save">
-                                <i class="fas fa-plus"></i>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i>
                                 Thêm khách hàng
                             </button>
-                            <a href="/admin/customers" class="btn btn-cancel">
-                                <i class="fas fa-times"></i>
-                                Hủy
+                            <a href="/admin/customers" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Quay lại
                             </a>
                         </div>
                     </form>
@@ -194,55 +544,46 @@
     </div>
 
     <script>
+        // Toggle sidebar on mobile
         function toggleSidebar() {
             const sidebar = document.querySelector('.admin-sidebar');
-            sidebar.classList.toggle('open');
+            sidebar.classList.toggle('active');
         }
-        
-        function showAlert(message, type) {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.className = `alert alert-${type}`;
-            alert.style.display = 'block';
-            
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 3000);
-        }
-        
-        document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData);
-            
-            // Kiểm tra mật khẩu
-            if (data.password.length < 6) {
-                showAlert('Mật khẩu phải có ít nhất 6 ký tự', 'error');
-                return;
-            }
-            
-            fetch('/admin/customers/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    showAlert(result.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = '/admin/customers';
-                    }, 1500);
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#e74c3c';
                 } else {
-                    showAlert(result.message, 'error');
+                    field.style.borderColor = '#ddd';
                 }
-            })
-            .catch(error => {
-                showAlert('Có lỗi xảy ra khi thêm khách hàng', 'error');
             });
+
+            // Validate email format
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                isValid = false;
+                document.getElementById('email').style.borderColor = '#e74c3c';
+            }
+
+            // Validate phone format
+            const phone = document.getElementById('phone').value;
+            const phoneRegex = /^[0-9]{10,11}$/;
+            if (phone && !phoneRegex.test(phone)) {
+                isValid = false;
+                document.getElementById('phone').style.borderColor = '#e74c3c';
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc và đảm bảo định dạng hợp lệ!');
+            }
         });
     </script>
 </body>
