@@ -1699,8 +1699,6 @@ class AdminController {
       if (type) {
         if (type === 'service') {
           whereConditions.push(`r.service_id IS NOT NULL`);
-        } else if (type === 'product') {
-          whereConditions.push(`r.product_id IS NOT NULL`);
         } else if (type === 'stylist') {
           whereConditions.push(`r.stylist_id IS NOT NULL`);
         }
@@ -1722,11 +1720,10 @@ class AdminController {
       // Get reviews with pagination
       const [reviews] = await db.execute(`
         SELECT r.*, u.name as customer_name, u.email as customer_email,
-               s.name as service_name, p.name as product_name, st.name as stylist_name
+               s.name as service_name, st.name as stylist_name
         FROM reviews r
         LEFT JOIN users u ON r.user_id = u.id
         LEFT JOIN services s ON r.service_id = s.id
-        LEFT JOIN products p ON r.product_id = p.id
         LEFT JOIN stylists st ON r.stylist_id = st.id
         ${whereClause}
         ORDER BY r.created_at DESC
