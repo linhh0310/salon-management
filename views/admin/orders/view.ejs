@@ -1,395 +1,185 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết đơn hàng - LYN Salon</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .order-detail-container {
-            max-width: 1000px;
-            margin: 50px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
+<%- include('../partials/header') %>
 
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .order-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .order-id {
-            background: #3498db;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .order-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .info-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        .info-section h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .info-value {
-            color: #6c757d;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-confirmed { background: #d1ecf1; color: #0c5460; }
-        .status-shipped { background: #d4edda; color: #155724; }
-        .status-delivered { background: #c3e6cb; color: #155724; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
-
-        .order-items {
-            margin-bottom: 30px;
-        }
-
-        .items-header {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .item-card {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            background: #f8f9fa;
-        }
-
-        .item-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-
-        .item-details {
-            flex: 1;
-        }
-
-        .item-name {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .item-price {
-            color: #28a745;
-            font-weight: bold;
-        }
-
-        .item-quantity {
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-        .order-total {
-            background: #e9ecef;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: right;
-        }
-
-        .total-amount {
-            font-size: 24px;
-            font-weight: bold;
-            color: #28a745;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn:hover {
-            opacity: 0.8;
-        }
-    </style>
-</head>
-<body>
-    <div class="order-detail-container">
-        <div class="order-header">
-            <div class="order-title">
-                <i class="fas fa-shopping-cart"></i> Chi tiết đơn hàng
-            </div>
-            <div class="order-id">#<%= order.id %></div>
+<div class="flex h-screen bg-gray-100">
+  <%- include('../partials/sidebar') %>
+  
+  <div class="flex-1 overflow-auto">
+    <div class="p-6">
+      <!-- Header -->
+      <div class="mb-6 flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Chi tiết đơn hàng #<%= order.id %></h1>
+          <p class="text-gray-600">Thông tin chi tiết về đơn hàng</p>
         </div>
-
-        <div class="order-info">
-            <div class="info-section">
-                <h3><i class="fas fa-user"></i> Thông tin khách hàng</h3>
-                <div class="info-row">
-                    <span class="info-label">Tên khách hàng:</span>
-                    <span class="info-value"><%= order.customer_name %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Họ tên người nhận:</span>
-                    <span class="info-value"><%= order.full_name || 'Chưa có' %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Số điện thoại:</span>
-                    <span class="info-value"><%= order.phone || 'Chưa có' %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Email:</span>
-                    <span class="info-value"><%= order.email || 'Chưa có' %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Tỉnh/thành phố:</span>
-                    <span class="info-value"><%= order.province || 'Chưa có' %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Quận/huyện:</span>
-                    <span class="info-value"><%= order.district || 'Chưa có' %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Phường/xã:</span>
-                    <span class="info-value"><%= order.ward || 'Chưa có' %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Địa chỉ chi tiết:</span>
-                    <span class="info-value"><%= order.shipping_address || 'Chưa có' %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Phương thức thanh toán:</span>
-                    <span class="info-value"><%= order.payment_method || 'Chưa chọn' %></span>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h3><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h3>
-                <div class="info-row">
-                    <span class="info-label">Ngày đặt:</span>
-                    <span class="info-value"><%= new Date(order.created_at).toLocaleDateString('vi-VN') %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Trạng thái:</span>
-                    <span class="status-badge status-<%= order.status %>">
-                        <% if (order.status === 'pending') { %>Chờ xác nhận<% } %>
-                        <% if (order.status === 'confirmed') { %>Đã xác nhận<% } %>
-                        <% if (order.status === 'shipped') { %>Đang giao<% } %>
-                        <% if (order.status === 'delivered') { %>Đã giao<% } %>
-                        <% if (order.status === 'cancelled') { %>Đã hủy<% } %>
-                    </span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Ghi chú:</span>
-                    <span class="info-value"><%= order.notes || 'Không có' %></span>
-                </div>
-            </div>
+        <div class="flex space-x-3">
+          <a href="/admin/orders/edit/<%= order.id %>" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700">
+            <i class="fas fa-edit mr-2"></i>Sửa đơn hàng
+          </a>
+          <a href="/admin/orders" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            <i class="fas fa-arrow-left mr-2"></i>Quay lại
+          </a>
         </div>
+      </div>
 
-        <div class="order-items">
-            <div class="items-header">
-                <i class="fas fa-box"></i> Sản phẩm trong đơn hàng
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Order Information -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Thông tin đơn hàng</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Mã đơn hàng</label>
+                <p class="text-lg font-semibold text-gray-900">#<%= order.id %></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Trạng thái</label>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                  <% if (order.status === 'pending') { %>bg-yellow-100 text-yellow-800<% } %>
+                  <% if (order.status === 'confirmed') { %>bg-blue-100 text-blue-800<% } %>
+                  <% if (order.status === 'shipped') { %>bg-green-100 text-green-800<% } %>
+                  <% if (order.status === 'delivered') { %>bg-purple-100 text-purple-800<% } %>
+                  <% if (order.status === 'cancelled') { %>bg-red-100 text-red-800<% } %>">
+                  <% if (order.status === 'pending') { %><i class="fas fa-clock mr-2"></i>Chờ xác nhận<% } %>
+                  <% if (order.status === 'confirmed') { %><i class="fas fa-check mr-2"></i>Đã xác nhận<% } %>
+                  <% if (order.status === 'shipped') { %><i class="fas fa-truck mr-2"></i>Đang giao<% } %>
+                  <% if (order.status === 'delivered') { %><i class="fas fa-check-circle mr-2"></i>Đã giao<% } %>
+                  <% if (order.status === 'cancelled') { %><i class="fas fa-times mr-2"></i>Đã hủy<% } %>
+                </span>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Ngày đặt</label>
+                <p class="text-gray-900"><%= new Date(order.created_at).toLocaleDateString('vi-VN') %></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Tổng tiền</label>
+                <p class="text-lg font-semibold text-green-600">₫<%= order.total_amount.toLocaleString() %></p>
+              </div>
             </div>
-            
-            <% if (orderItems && orderItems.length > 0) { %>
-                <% orderItems.forEach(function(item) { %>
-                    <div class="item-card">
-                        <img src="<%= item.product_image || '/images/product1.jpg' %>" alt="<%= item.product_name %>" class="item-image" onerror="this.src='/images/product1.jpg'">
-                        <div class="item-details">
-                            <div class="item-name"><%= item.product_name %></div>
-                            <div class="item-price"><%= formatPrice(item.price || 0) %></div>
-                            <div class="item-quantity">Số lượng: <%= item.quantity %></div>
+            <% if (order.notes) { %>
+              <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700">Ghi chú</label>
+                <p class="text-gray-900 bg-gray-50 p-3 rounded-md"><%= order.notes %></p>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Customer Information -->
+          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Thông tin khách hàng</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Tên khách hàng</label>
+                <p class="text-gray-900"><%= order.customer_name %></p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <p class="text-gray-900"><%= order.customer_email %></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Sản phẩm trong đơn hàng</h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sản phẩm</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đơn giá</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <% orderItems.forEach(function(item) { %>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                          <% if (item.product_image) { %>
+                            <img class="h-10 w-10 rounded-full object-cover mr-3" src="<%= item.product_image %>" alt="<%= item.product_name %>">
+                          <% } %>
+                          <div>
+                            <div class="text-sm font-medium text-gray-900"><%= item.product_name %></div>
+                          </div>
                         </div>
-                        <div class="item-total">
-                            <strong><%= formatPrice(item.price * item.quantity) %></strong>
-                        </div>
-                    </div>
-                <% }); %>
-            <% } else { %>
-                <p style="text-align: center; color: #6c757d; padding: 20px;">Không có sản phẩm nào trong đơn hàng</p>
-            <% } %>
-        </div>
-
-        <div class="order-total">
-            <div class="total-amount">
-                                        Tổng cộng: <%= formatPrice(order.total_amount || 0) %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ₫<%= item.price.toLocaleString() %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <%= item.quantity %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ₫<%= (item.price * item.quantity).toLocaleString() %>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+                <tfoot class="bg-gray-50">
+                  <tr>
+                    <td colspan="3" class="px-6 py-4 text-right text-sm font-medium text-gray-900">Tổng cộng:</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                      ₫<%= order.total_amount.toLocaleString() %>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
+          </div>
         </div>
 
-        <div class="action-buttons">
-            <a href="/admin/orders" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Quay lại
-            </a>
-            
-            <% if (order.status === 'pending') { %>
-                <button class="btn btn-success" onclick="updateStatus('confirmed')">
-                    <i class="fas fa-check"></i> Xác nhận đơn hàng
-                </button>
-                <button class="btn btn-danger" onclick="updateStatus('cancelled')">
-                    <i class="fas fa-times"></i> Hủy đơn hàng
-                </button>
-            <% } %>
-            
-            <% if (order.status === 'confirmed') { %>
-                <button class="btn btn-primary" onclick="updateStatus('shipped')">
-                    <i class="fas fa-shipping-fast"></i> Bắt đầu giao hàng
-                </button>
-            <% } %>
-            
-            <% if (order.status === 'shipped') { %>
-                <button class="btn btn-success" onclick="updateStatus('delivered')">
-                    <i class="fas fa-check-double"></i> Hoàn thành giao hàng
-                </button>
-            <% } %>
-            
-            <button class="btn btn-danger" onclick="deleteOrder()">
-                <i class="fas fa-trash"></i> Xóa đơn hàng
-            </button>
+        <!-- Order Actions -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Thao tác</h2>
+            <div class="space-y-3">
+              <button onclick="updateStatus('<%= order.id %>', 'confirmed')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <i class="fas fa-check mr-2"></i>Xác nhận đơn hàng
+              </button>
+              <button onclick="updateStatus('<%= order.id %>', 'shipped')" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                <i class="fas fa-truck mr-2"></i>Bắt đầu giao hàng
+              </button>
+              <button onclick="updateStatus('<%= order.id %>', 'delivered')" class="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                <i class="fas fa-check-circle mr-2"></i>Hoàn thành giao hàng
+              </button>
+              <button onclick="updateStatus('<%= order.id %>', 'cancelled')" class="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                <i class="fas fa-times mr-2"></i>Hủy đơn hàng
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script>
-        function updateStatus(status) {
-            const statusText = {
-                'confirmed': 'xác nhận',
-                'shipped': 'bắt đầu giao hàng',
-                'delivered': 'hoàn thành giao hàng',
-                'cancelled': 'hủy'
-            };
-            
-            if (confirm(`Bạn có chắc muốn ${statusText[status]} đơn hàng này?`)) {
-                fetch(`/admin/orders/<%= order.id %>/status`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ status: status })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert('Có lỗi xảy ra: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi cập nhật trạng thái');
-                });
-            }
-        }
+<script>
+function updateStatus(orderId, status) {
+  if (confirm('Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng này?')) {
+    fetch(`/admin/orders/${orderId}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status: status })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Cập nhật trạng thái thành công!');
+        location.reload();
+      } else {
+        alert('Có lỗi xảy ra: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Có lỗi xảy ra khi cập nhật trạng thái');
+    });
+  }
+}
+</script>
 
-        function deleteOrder() {
-            if (confirm('Bạn có chắc muốn xóa đơn hàng này?')) {
-                fetch(`/admin/orders/<%= order.id %>/delete`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        window.location.href = '/admin/orders';
-                    } else {
-                        alert('Có lỗi xảy ra: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi xóa đơn hàng');
-                });
-            }
-        }
-    </script>
-</body>
-</html>
+<%- include('../partials/footer') %>
 

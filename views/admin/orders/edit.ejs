@@ -1,0 +1,227 @@
+<%- include('../partials/header') %>
+
+<div class="flex h-screen bg-gray-100">
+  <%- include('../partials/sidebar') %>
+  
+  <div class="flex-1 overflow-auto">
+    <div class="p-6">
+      <!-- Header -->
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Sửa đơn hàng #<%= order.id %></h1>
+        <p class="text-gray-600">Chỉnh sửa thông tin đơn hàng</p>
+      </div>
+
+      <!-- Form -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <form action="/admin/orders/edit/<%= order.id %>" method="POST" id="editOrderForm">
+          <!-- Customer Selection -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Khách hàng <span class="text-red-500">*</span>
+            </label>
+            <select name="customer_id" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Chọn khách hàng</option>
+              <% customers.forEach(function(customer) { %>
+                <option value="<%= customer.id %>" <%= customer.id == order.user_id ? 'selected' : '' %>>
+                  <%= customer.name %> (<%= customer.email %>)
+                </option>
+              <% }); %>
+            </select>
+          </div>
+
+          <!-- Products Selection -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Sản phẩm <span class="text-red-500">*</span>
+            </label>
+            <div id="productsContainer">
+              <% orderItems.forEach(function(item, index) { %>
+                <div class="product-item border border-gray-200 rounded-md p-4 mb-4">
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">Sản phẩm</label>
+                      <select name="products[<%= index %>][id]" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 product-select">
+                        <option value="">Chọn sản phẩm</option>
+                        <% products.forEach(function(product) { %>
+                          <option value="<%= product.id %>" data-price="<%= product.price %>" data-stock="<%= product.quantity %>" 
+                                  <%= product.id == item.product_id ? 'selected' : '' %>>
+                            <%= product.name %> - ₫<%= product.price.toLocaleString() %> (Còn: <%= product.quantity %>)
+                          </option>
+                        <% }); %>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">Số lượng</label>
+                      <input type="number" name="products[<%= index %>][quantity]" min="1" value="<%= item.quantity %>" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 quantity-input">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">Đơn giá</label>
+                      <input type="number" name="products[<%= index %>][price]" value="<%= item.price %>" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 price-input">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">Thành tiền</label>
+                      <input type="number" value="<%= item.price * item.quantity %>" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 subtotal-input">
+                    </div>
+                  </div>
+                  <button type="button" class="remove-product mt-2 text-red-600 hover:text-red-800 text-sm">Xóa sản phẩm</button>
+                </div>
+              <% }); %>
+            </div>
+            <button type="button" id="addProduct" class="text-blue-600 hover:text-blue-800 text-sm">
+              + Thêm sản phẩm
+            </button>
+          </div>
+
+          <!-- Order Details -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tổng tiền</label>
+              <input type="number" name="total_amount" id="totalAmount" value="<%= order.total_amount %>" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-semibold text-lg">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+              <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Chờ xác nhận</option>
+                <option value="confirmed" <%= order.status === 'confirmed' ? 'selected' : '' %>>Đã xác nhận</option>
+                <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Đang giao</option>
+                <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Đã giao</option>
+                <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Đã hủy</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+            <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ghi chú về đơn hàng..."><%= order.notes || '' %></textarea>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex justify-end space-x-4">
+            <a href="/admin/orders" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+              Hủy
+            </a>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              Cập nhật đơn hàng
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let productIndex = <%= orderItems.length - 1 %>;
+
+// Add product
+document.getElementById('addProduct').addEventListener('click', function() {
+  productIndex++;
+  const container = document.getElementById('productsContainer');
+  const productItem = document.createElement('div');
+  productItem.className = 'product-item border border-gray-200 rounded-md p-4 mb-4';
+  productItem.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Sản phẩm</label>
+        <select name="products[${productIndex}][id]" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 product-select">
+          <option value="">Chọn sản phẩm</option>
+          <% products.forEach(function(product) { %>
+            <option value="<%= product.id %>" data-price="<%= product.price %>" data-stock="<%= product.quantity %>">
+              <%= product.name %> - ₫<%= product.price.toLocaleString() %> (Còn: <%= product.quantity %>)
+            </option>
+          <% }); %>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Số lượng</label>
+        <input type="number" name="products[${productIndex}][quantity]" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 quantity-input">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Đơn giá</label>
+        <input type="number" name="products[${productIndex}][price]" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 price-input">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Thành tiền</label>
+        <input type="number" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 subtotal-input">
+      </div>
+    </div>
+    <button type="button" class="remove-product mt-2 text-red-600 hover:text-red-800 text-sm">Xóa sản phẩm</button>
+  `;
+  container.appendChild(productItem);
+  attachEventListeners(productItem);
+});
+
+// Remove product
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('remove-product')) {
+    const productItem = e.target.closest('.product-item');
+    if (document.querySelectorAll('.product-item').length > 1) {
+      productItem.remove();
+      calculateTotal();
+    }
+  }
+});
+
+// Calculate subtotal and total
+function attachEventListeners(productItem) {
+  const productSelect = productItem.querySelector('.product-select');
+  const quantityInput = productItem.querySelector('.quantity-input');
+  const priceInput = productItem.querySelector('.price-input');
+  const subtotalInput = productItem.querySelector('.subtotal-input');
+
+  productSelect.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const price = selectedOption.dataset.price || 0;
+    priceInput.value = price;
+    calculateSubtotal(productItem);
+    calculateTotal();
+  });
+
+  quantityInput.addEventListener('input', function() {
+    calculateSubtotal(productItem);
+    calculateTotal();
+  });
+}
+
+function calculateSubtotal(productItem) {
+  const quantity = parseInt(productItem.querySelector('.quantity-input').value) || 0;
+  const price = parseInt(productItem.querySelector('.price-input').value) || 0;
+  const subtotal = quantity * price;
+  productItem.querySelector('.subtotal-input').value = subtotal;
+}
+
+function calculateTotal() {
+  const subtotals = Array.from(document.querySelectorAll('.subtotal-input')).map(input => parseInt(input.value) || 0);
+  const total = subtotals.reduce((sum, subtotal) => sum + subtotal, 0);
+  document.getElementById('totalAmount').value = total;
+}
+
+// Attach event listeners to initial product items
+document.querySelectorAll('.product-item').forEach(attachEventListeners);
+
+// Form validation
+document.getElementById('editOrderForm').addEventListener('submit', function(e) {
+  const customerId = document.querySelector('select[name="customer_id"]').value;
+  const products = document.querySelectorAll('.product-select');
+  let hasProducts = false;
+
+  products.forEach(product => {
+    if (product.value) hasProducts = true;
+  });
+
+  if (!customerId) {
+    e.preventDefault();
+    alert('Vui lòng chọn khách hàng');
+    return;
+  }
+
+  if (!hasProducts) {
+    e.preventDefault();
+    alert('Vui lòng chọn ít nhất một sản phẩm');
+    return;
+  }
+});
+</script>
+
+<%- include('../partials/footer') %>

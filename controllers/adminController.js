@@ -1508,6 +1508,24 @@ class AdminController {
         return res.redirect('/admin/orders/add');
       }
 
+      // Parse products array
+      let productArray;
+      try {
+        if (typeof products === 'string') {
+          productArray = JSON.parse(products);
+        } else {
+          productArray = products;
+        }
+      } catch (e) {
+        productArray = products;
+      }
+
+      // Validate products
+      if (!Array.isArray(productArray) || productArray.length === 0) {
+        req.flash('error', 'Vui lòng chọn ít nhất một sản phẩm');
+        return res.redirect('/admin/orders/add');
+      }
+
       // Tạo đơn hàng mới
       const [orderResult] = await db.execute(`
         INSERT INTO orders (user_id, total_amount, status, notes, created_at, updated_at)
@@ -1517,19 +1535,20 @@ class AdminController {
       const orderId = orderResult.insertId;
 
       // Thêm các sản phẩm vào đơn hàng
-      const productArray = JSON.parse(products);
       for (const product of productArray) {
-        await db.execute(`
-          INSERT INTO order_items (order_id, product_id, quantity, price)
-          VALUES (?, ?, ?, ?)
-        `, [orderId, product.id, product.quantity, product.price]);
+        if (product.id && product.quantity && product.price) {
+          await db.execute(`
+            INSERT INTO order_items (order_id, product_id, quantity, price)
+            VALUES (?, ?, ?, ?)
+          `, [orderId, product.id, product.quantity, product.price]);
 
-        // Cập nhật số lượng sản phẩm
-        await db.execute(`
-          UPDATE products 
-          SET quantity = quantity - ? 
-          WHERE id = ?
-        `, [product.quantity, product.id]);
+          // Cập nhật số lượng sản phẩm
+          await db.execute(`
+            UPDATE products 
+            SET quantity = quantity - ? 
+            WHERE id = ?
+          `, [product.quantity, product.id]);
+        }
       }
 
       req.flash('success', 'Thêm đơn hàng thành công!');
@@ -1600,12 +1619,30 @@ class AdminController {
       }
 
       const { id } = req.params;
-      const { customer_id, total_amount, status, notes } = req.body;
+      const { customer_id, products, total_amount, status, notes } = req.body;
 
       // Validate required fields
       if (!customer_id || !total_amount) {
         req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
-        return res.redirect(`/admin/orders/${id}/edit`);
+        return res.redirect(`/admin/orders/edit/${id}`);
+      }
+
+      // Parse products array
+      let productArray;
+      try {
+        if (typeof products === 'string') {
+          productArray = JSON.parse(products);
+        } else {
+          productArray = products;
+        }
+      } catch (e) {
+        productArray = products;
+      }
+
+      // Validate products
+      if (!Array.isArray(productArray) || productArray.length === 0) {
+        req.flash('error', 'Vui lòng chọn ít nhất một sản phẩm');
+        return res.redirect(`/admin/orders/edit/${id}`);
       }
 
       // Cập nhật đơn hàng
@@ -1615,12 +1652,25 @@ class AdminController {
         WHERE id = ?
       `, [customer_id, total_amount, status || 'pending', notes || null, id]);
 
+      // Xóa tất cả order_items cũ
+      await db.execute('DELETE FROM order_items WHERE order_id = ?', [id]);
+
+      // Thêm lại các sản phẩm mới
+      for (const product of productArray) {
+        if (product.id && product.quantity && product.price) {
+          await db.execute(`
+            INSERT INTO order_items (order_id, product_id, quantity, price)
+            VALUES (?, ?, ?, ?)
+          `, [id, product.id, product.quantity, product.price]);
+        }
+      }
+
       req.flash('success', 'Cập nhật đơn hàng thành công!');
       res.redirect('/admin/orders');
     } catch (error) {
       console.error('Error in postEditOrder:', error);
       req.flash('error', 'Có lỗi xảy ra khi cập nhật đơn hàng');
-      res.redirect(`/admin/orders/${id}/edit`);
+      res.redirect(`/admin/orders/edit/${id}`);
     }
   }
 
