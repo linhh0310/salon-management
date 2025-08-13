@@ -982,6 +982,7 @@ class AdminController {
       const { id } = req.params;
       const Product = require('../models/productModel');
       const product = await Product.findById(id);
+      const categories = await Category.findAll();
 
       if (!product) {
         req.flash('error', 'Không tìm thấy sản phẩm!');
@@ -991,7 +992,8 @@ class AdminController {
       res.render('admin/products/edit', {
         title: 'Sửa Sản phẩm',
         user: req.session.user,
-        product
+        product,
+        categories
       });
     } catch (error) {
       console.error('Error in getEditProduct:', error);
@@ -1008,7 +1010,7 @@ class AdminController {
       }
 
       const { id } = req.params;
-      const { name, description, price, quantity, category, features } = req.body;
+      const { name, description, price, quantity, category_id, features, is_active } = req.body;
       
       // Xử lý upload ảnh
       let imageUrl = req.body.current_image;
@@ -1022,9 +1024,10 @@ class AdminController {
         description,
         price: parseFloat(price),
         quantity: parseInt(quantity),
-        category,
+        category_id: category_id || null,
         image_url: imageUrl,
-        features: features ? JSON.stringify(features.split(',').map(f => f.trim())) : null
+        features: features ? JSON.stringify(features.split(',').map(f => f.trim())) : null,
+        is_active: is_active === 'true' ? 1 : (is_active === 'false' ? 0 : 1)
       });
 
       if (success) {
