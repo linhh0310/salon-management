@@ -1283,26 +1283,94 @@ class AdminController {
       }
 
       const Order = require('../models/orderModel');
-      const orders = await Order.findAll();
       
-      // Thêm thông tin số lượng sản phẩm cho mỗi đơn hàng
-      const ordersWithItems = await Promise.all(orders.map(async (order) => {
-        const [items] = await db.execute(`
-          SELECT COUNT(*) as items_count 
-          FROM order_items 
-          WHERE order_id = ?
-        `, [order.id]);
-        
-        return {
-          ...order,
-          items_count: items[0].items_count
-        };
-      }));
+      // Get query parameters
+      const { search, status, from_date, to_date, page = 1 } = req.query;
+      const limit = 10;
+      const offset = (page - 1) * limit;
+
+      // Build query conditions
+      let whereConditions = [];
+      let queryParams = [];
+
+      if (search) {
+        whereConditions.push(`(o.id LIKE ? OR c.name LIKE ? OR c.email LIKE ?)`);
+        queryParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      }
+
+      if (status) {
+        whereConditions.push(`o.status = ?`);
+        queryParams.push(status);
+      }
+
+      if (from_date) {
+        whereConditions.push(`DATE(o.created_at) >= ?`);
+        queryParams.push(from_date);
+      }
+
+      if (to_date) {
+        whereConditions.push(`DATE(o.created_at) <= ?`);
+        queryParams.push(to_date);
+      }
+
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+      // Get total count
+      const [countResult] = await db.execute(`
+        SELECT COUNT(*) as total
+        FROM orders o
+        LEFT JOIN customers c ON o.customer_id = c.id
+        ${whereClause}
+      `, queryParams);
+
+      const totalOrders = countResult[0].total;
+      const totalPages = Math.ceil(totalOrders / limit);
+
+      // Get orders with pagination
+      const [orders] = await db.execute(`
+        SELECT o.*, c.name as customer_name,
+               (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) as total_items
+        FROM orders o
+        LEFT JOIN customers c ON o.customer_id = c.id
+        ${whereClause}
+        ORDER BY o.created_at DESC
+        LIMIT ? OFFSET ?
+      `, [...queryParams, limit, offset]);
+
+      // Get statistics
+      const [statsResult] = await db.execute(`
+        SELECT 
+          COUNT(*) as total,
+          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+          SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) as confirmed,
+          SUM(CASE WHEN status = 'shipped' THEN 1 ELSE 0 END) as shipped,
+          SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) as delivered,
+          SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled
+        FROM orders
+      `);
+
+      const stats = statsResult[0];
+
+      // Build query string for pagination
+      const queryParamsForPagination = new URLSearchParams();
+      if (search) queryParamsForPagination.append('search', search);
+      if (status) queryParamsForPagination.append('status', status);
+      if (from_date) queryParamsForPagination.append('from_date', from_date);
+      if (to_date) queryParamsForPagination.append('to_date', to_date);
+      const queryString = queryParamsForPagination.toString() ? `&${queryParamsForPagination.toString()}` : '';
       
       res.render('admin/orders', {
         title: 'Quản lý Đơn hàng',
         user: req.session.user,
-        orders: ordersWithItems
+        orders,
+        stats,
+        search,
+        status,
+        from_date,
+        to_date,
+        currentPage: parseInt(page),
+        totalPages,
+        queryString
       });
     } catch (error) {
       console.error('Error in getOrders:', error);
@@ -1397,6 +1465,161 @@ class AdminController {
     } catch (error) {
       console.error('Error in deleteOrder:', error);
       res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi xóa đơn hàng' });
+    }
+  }
+
+  // Hiển thị form thêm đơn hàng
+  static async getAddOrder(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      // Lấy danh sách khách hàng và sản phẩm
+      const [customers] = await db.execute('SELECT id, name, email FROM customers ORDER BY name');
+      const [products] = await db.execute('SELECT id, name, price, quantity FROM products WHERE is_active = 1 ORDER BY name');
+
+      res.render('admin/orders/add', {
+        title: 'Thêm đơn hàng mới',
+        user: req.session.user,
+        customers,
+        products
+      });
+    } catch (error) {
+      console.error('Error in getAddOrder:', error);
+      req.flash('error', 'Có lỗi xảy ra khi tải form thêm đơn hàng');
+      res.redirect('/admin/orders');
+    }
+  }
+
+  // Xử lý thêm đơn hàng
+  static async postAddOrder(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { customer_id, products, total_amount, status, notes } = req.body;
+
+      // Validate required fields
+      if (!customer_id || !products || !total_amount) {
+        req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+        return res.redirect('/admin/orders/add');
+      }
+
+      // Tạo đơn hàng mới
+      const [orderResult] = await db.execute(`
+        INSERT INTO orders (customer_id, total_amount, status, notes, created_at, updated_at)
+        VALUES (?, ?, ?, ?, NOW(), NOW())
+      `, [customer_id, total_amount, status || 'pending', notes || null]);
+
+      const orderId = orderResult.insertId;
+
+      // Thêm các sản phẩm vào đơn hàng
+      const productArray = JSON.parse(products);
+      for (const product of productArray) {
+        await db.execute(`
+          INSERT INTO order_items (order_id, product_id, quantity, price)
+          VALUES (?, ?, ?, ?)
+        `, [orderId, product.id, product.quantity, product.price]);
+
+        // Cập nhật số lượng sản phẩm
+        await db.execute(`
+          UPDATE products 
+          SET quantity = quantity - ? 
+          WHERE id = ?
+        `, [product.quantity, product.id]);
+      }
+
+      req.flash('success', 'Thêm đơn hàng thành công!');
+      res.redirect('/admin/orders');
+    } catch (error) {
+      console.error('Error in postAddOrder:', error);
+      req.flash('error', 'Có lỗi xảy ra khi thêm đơn hàng');
+      res.redirect('/admin/orders/add');
+    }
+  }
+
+  // Hiển thị form sửa đơn hàng
+  static async getEditOrder(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { id } = req.params;
+
+      // Lấy thông tin đơn hàng
+      const [orders] = await db.execute(`
+        SELECT o.*, c.name as customer_name, c.email as customer_email
+        FROM orders o
+        LEFT JOIN customers c ON o.customer_id = c.id
+        WHERE o.id = ?
+      `, [id]);
+
+      if (orders.length === 0) {
+        req.flash('error', 'Không tìm thấy đơn hàng!');
+        return res.redirect('/admin/orders');
+      }
+
+      const order = orders[0];
+
+      // Lấy chi tiết sản phẩm trong đơn hàng
+      const [orderItems] = await db.execute(`
+        SELECT oi.*, p.name as product_name, p.price as product_price
+        FROM order_items oi
+        LEFT JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+      `, [id]);
+
+      // Lấy danh sách khách hàng và sản phẩm
+      const [customers] = await db.execute('SELECT id, name, email FROM customers ORDER BY name');
+      const [products] = await db.execute('SELECT id, name, price, quantity FROM products WHERE is_active = 1 ORDER BY name');
+
+      res.render('admin/orders/edit', {
+        title: 'Sửa đơn hàng',
+        user: req.session.user,
+        order,
+        orderItems,
+        customers,
+        products
+      });
+    } catch (error) {
+      console.error('Error in getEditOrder:', error);
+      req.flash('error', 'Có lỗi xảy ra khi tải form sửa đơn hàng');
+      res.redirect('/admin/orders');
+    }
+  }
+
+  // Xử lý sửa đơn hàng
+  static async postEditOrder(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+      }
+
+      const { id } = req.params;
+      const { customer_id, total_amount, status, notes } = req.body;
+
+      // Validate required fields
+      if (!customer_id || !total_amount) {
+        req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
+        return res.redirect(`/admin/orders/${id}/edit`);
+      }
+
+      // Cập nhật đơn hàng
+      await db.execute(`
+        UPDATE orders 
+        SET customer_id = ?, total_amount = ?, status = ?, notes = ?, updated_at = NOW()
+        WHERE id = ?
+      `, [customer_id, total_amount, status || 'pending', notes || null, id]);
+
+      req.flash('success', 'Cập nhật đơn hàng thành công!');
+      res.redirect('/admin/orders');
+    } catch (error) {
+      console.error('Error in postEditOrder:', error);
+      req.flash('error', 'Có lỗi xảy ra khi cập nhật đơn hàng');
+      res.redirect(`/admin/orders/${id}/edit`);
     }
   }
 

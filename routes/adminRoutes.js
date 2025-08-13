@@ -107,9 +107,13 @@ router.post('/employees/:id/delete', requireAdmin, adminController.deleteEmploye
 
 // Quản lý orders
 router.get('/orders', requireAdmin, adminController.getOrders);
+router.get('/orders/add', requireAdmin, adminController.getAddOrder);
+router.post('/orders/add', requireAdmin, adminController.postAddOrder);
 router.get('/orders/:id/view', requireAdmin, adminController.getViewOrder);
+router.get('/orders/:id/edit', requireAdmin, adminController.getEditOrder);
+router.post('/orders/:id/edit', requireAdmin, adminController.postEditOrder);
 router.post('/orders/:id/status', requireAdmin, adminController.updateOrderStatus);
-router.post('/orders/:id/delete', requireAdmin, adminController.deleteOrder);
+router.delete('/orders/:id/delete', requireAdmin, adminController.deleteOrder);
 
 // Quản lý reviews
 router.get('/reviews', requireAdmin, adminController.getReviews);
