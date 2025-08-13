@@ -5,8 +5,10 @@ class Product {
   static async findAll() {
     try {
       const [rows] = await db.execute(`
-        SELECT * FROM products 
-        ORDER BY created_at DESC
+        SELECT p.*, c.name as category_name 
+        FROM products p 
+        LEFT JOIN categories c ON p.category_id = c.id 
+        ORDER BY p.created_at DESC
       `);
       return rows;
     } catch (error) {
@@ -47,12 +49,25 @@ class Product {
   // Tạo sản phẩm mới
   static async create(productData) {
     try {
-      const { name, description, price, quantity, category, image_url, features } = productData;
+      const { name, description, price, quantity, category_id, image_url, features, is_active } = productData;
+      
+      // Lấy tên category từ category_id
+      let categoryName = '';
+      if (category_id) {
+        try {
+          const [categoryRows] = await db.execute('SELECT name FROM categories WHERE id = ?', [category_id]);
+          if (categoryRows.length > 0) {
+            categoryName = categoryRows[0].name;
+          }
+        } catch (error) {
+          console.error('❌ Lỗi khi lấy tên category:', error);
+        }
+      }
       
       const [result] = await db.execute(`
-        INSERT INTO products (name, description, price, quantity, category, image_url, features, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
-      `, [name, description, price, quantity, category, image_url, features || null]);
+        INSERT INTO products (name, description, price, quantity, category, category_id, image_url, features, is_active, created_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+      `, [name, description, price, quantity, categoryName, category_id, image_url, features || null, is_active || 1]);
       
       return result.insertId;
     } catch (error) {
@@ -64,14 +79,27 @@ class Product {
   // Cập nhật sản phẩm
   static async update(id, productData) {
     try {
-      const { name, description, price, quantity, category, image_url, features } = productData;
+      const { name, description, price, quantity, category_id, image_url, features, is_active } = productData;
+      
+      // Lấy tên category từ category_id
+      let categoryName = '';
+      if (category_id) {
+        try {
+          const [categoryRows] = await db.execute('SELECT name FROM categories WHERE id = ?', [category_id]);
+          if (categoryRows.length > 0) {
+            categoryName = categoryRows[0].name;
+          }
+        } catch (error) {
+          console.error('❌ Lỗi khi lấy tên category:', error);
+        }
+      }
       
       const [result] = await db.execute(`
         UPDATE products 
         SET name = ?, description = ?, price = ?, quantity = ?, 
-            category = ?, image_url = ?, features = ?, updated_at = NOW()
+            category = ?, category_id = ?, image_url = ?, features = ?, is_active = ?, updated_at = NOW()
         WHERE id = ?
-      `, [name, description, price, quantity, category, image_url, features || null, id]);
+      `, [name, description, price, quantity, categoryName, category_id, image_url, features || null, is_active || 1, id]);
       
       return result.affectedRows > 0;
     } catch (error) {

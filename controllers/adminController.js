@@ -851,15 +851,60 @@ class AdminController {
         return res.redirect('/login');
       }
 
+      const { status, search, category_id, page = 1 } = req.query;
+      const limit = 10;
+      const offset = (page - 1) * limit;
+
       const Product = require('../models/productModel');
-      const products = await Product.findAll();
+      let products = await Product.findAll();
       const categories = await Category.findAll();
+
+      // Lọc theo trạng thái
+      if (status) {
+        if (status === 'active') {
+          products = products.filter(product => product.is_active === 1);
+        } else if (status === 'inactive') {
+          products = products.filter(product => product.is_active === 0);
+        }
+      }
+
+      // Lọc theo danh mục
+      if (category_id) {
+        products = products.filter(product => product.category_id == category_id);
+      }
+
+      // Tìm kiếm
+      if (search) {
+        products = products.filter(product =>
+          product.name?.toLowerCase().includes(search.toLowerCase()) ||
+          product.description?.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      // Tính toán thống kê
+      const stats = {
+        total: products.length,
+        active: products.filter(p => p.is_active === 1).length,
+        inactive: products.filter(p => p.is_active === 0).length,
+        lowStock: products.filter(p => p.quantity < 10).length
+      };
+
+      // Phân trang
+      const totalPages = Math.ceil(products.length / limit);
+      const currentPage = parseInt(page);
+      const paginatedProducts = products.slice(offset, offset + limit);
       
       res.render('admin/products', {
         title: 'Quản lý Sản phẩm',
         user: req.session.user,
-        products,
-        categories
+        products: paginatedProducts,
+        categories,
+        stats,
+        currentPage,
+        totalPages,
+        status,
+        search,
+        category_id
       });
     } catch (error) {
       console.error('Error in getProducts:', error);
@@ -871,15 +916,18 @@ class AdminController {
   }
 
   // Hiển thị form thêm sản phẩm
-  static getAddProduct(req, res) {
+  static async getAddProduct(req, res) {
     try {
       if (!req.session.user || req.session.user.role !== 'admin') {
         return res.redirect('/login');
       }
 
+      const categories = await Category.findAll();
+
       res.render('admin/products/add', {
         title: 'Thêm Sản phẩm',
-        user: req.session.user
+        user: req.session.user,
+        categories
       });
     } catch (error) {
       console.error('Error in getAddProduct:', error);
@@ -895,7 +943,7 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      const { name, description, price, quantity, category, features } = req.body;
+      const { name, description, price, quantity, category_id, features, is_active } = req.body;
       
       // Xử lý upload ảnh
       let imageUrl = null;
@@ -909,9 +957,10 @@ class AdminController {
         description,
         price: parseFloat(price),
         quantity: parseInt(quantity),
-        category,
+        category_id: category_id || null,
         image_url: imageUrl,
-        features: features ? JSON.stringify(features.split(',').map(f => f.trim())) : null
+        features: features ? JSON.stringify(features.split(',').map(f => f.trim())) : null,
+        is_active: is_active === 'true' ? 1 : (is_active === 'false' ? 0 : 1)
       });
 
       req.flash('success', 'Thêm sản phẩm thành công!');
