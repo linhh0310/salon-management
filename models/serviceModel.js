@@ -4,16 +4,30 @@ class Service {
   // Tạo service mới
   static async create(serviceData) {
     const { name, description, price, duration, category_id, is_active } = serviceData;
+    
+    // Lấy tên category từ category_id
+    let categoryName = '';
+    if (category_id) {
+      try {
+        const [categoryRows] = await db.execute('SELECT name FROM categories WHERE id = ?', [category_id]);
+        if (categoryRows.length > 0) {
+          categoryName = categoryRows[0].name;
+        }
+      } catch (error) {
+        console.error('❌ Lỗi khi lấy tên category:', error);
+      }
+    }
+    
     const query = `
-      INSERT INTO services (name, description, price, duration, category_id, is_active) 
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO services (name, description, price, duration, category, category_id, is_active) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     
     console.log('🔍 Service.create - Query:', query);
-    console.log('📦 Service.create - Parameters:', [name, description, price, duration, category_id, is_active]);
+    console.log('📦 Service.create - Parameters:', [name, description, price, duration, categoryName, category_id, is_active]);
     
     try {
-      const [result] = await db.execute(query, [name, description, price, duration, category_id, is_active]);
+      const [result] = await db.execute(query, [name, description, price, duration, categoryName, category_id, is_active]);
       console.log('✅ Service.create - Result:', result);
       return result.insertId;
     } catch (error) {
@@ -78,14 +92,28 @@ class Service {
   // Cập nhật service
   static async update(id, serviceData) {
     const { name, description, price, duration, category_id, is_active } = serviceData;
+    
+    // Lấy tên category từ category_id
+    let categoryName = '';
+    if (category_id) {
+      try {
+        const [categoryRows] = await db.execute('SELECT name FROM categories WHERE id = ?', [category_id]);
+        if (categoryRows.length > 0) {
+          categoryName = categoryRows[0].name;
+        }
+      } catch (error) {
+        console.error('❌ Lỗi khi lấy tên category:', error);
+      }
+    }
+    
     const query = `
       UPDATE services 
-      SET name = ?, description = ?, price = ?, duration = ?, category_id = ?, is_active = ?
+      SET name = ?, description = ?, price = ?, duration = ?, category = ?, category_id = ?, is_active = ?
       WHERE id = ?
     `;
     
     try {
-      const [result] = await db.execute(query, [name, description, price, duration, category_id, is_active, id]);
+      const [result] = await db.execute(query, [name, description, price, duration, categoryName, category_id, is_active, id]);
       return result.affectedRows > 0;
     } catch (error) {
       throw error;
