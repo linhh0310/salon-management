@@ -1681,23 +1681,81 @@ class AdminController {
         return res.redirect('/login');
       }
 
-      // Mock data for reviews
-      const reviews = [
-        {
-          id: 1,
-          customer_name: 'Trần Thị B',
-          rating: 5,
-          content: 'Dịch vụ rất tốt, nhân viên thân thiện',
-          service_name: 'Cắt tóc nam',
-          status: 'pending',
-          created_at: '2024-01-15'
+      // Get query parameters
+      const { status, type, page = 1 } = req.query;
+      const limit = 10;
+      const currentPage = parseInt(page) || 1;
+      const offset = (currentPage - 1) * limit;
+
+      // Build query conditions
+      let whereConditions = [];
+      let queryParams = [];
+
+      if (status) {
+        whereConditions.push(`r.status = ?`);
+        queryParams.push(status);
+      }
+
+      if (type) {
+        if (type === 'service') {
+          whereConditions.push(`r.service_id IS NOT NULL`);
+        } else if (type === 'product') {
+          whereConditions.push(`r.product_id IS NOT NULL`);
+        } else if (type === 'stylist') {
+          whereConditions.push(`r.stylist_id IS NOT NULL`);
         }
-      ];
+      }
+
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+      // Get total count
+      const [countResult] = await db.execute(`
+        SELECT COUNT(*) as total
+        FROM reviews r
+        LEFT JOIN users u ON r.user_id = u.id
+        ${whereClause}
+      `, whereConditions.length > 0 ? queryParams : []);
+
+      const totalReviews = countResult[0].total;
+      const totalPages = Math.ceil(totalReviews / limit);
+
+      // Get reviews with pagination
+      const [reviews] = await db.execute(`
+        SELECT r.*, u.name as customer_name, u.email as customer_email,
+               s.name as service_name, p.name as product_name, st.name as stylist_name
+        FROM reviews r
+        LEFT JOIN users u ON r.user_id = u.id
+        LEFT JOIN services s ON r.service_id = s.id
+        LEFT JOIN products p ON r.product_id = p.id
+        LEFT JOIN stylists st ON r.stylist_id = st.id
+        ${whereClause}
+        ORDER BY r.created_at DESC
+        LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}
+      `, whereConditions.length > 0 ? queryParams : []);
+
+      // Get statistics
+      const [statsResult] = await db.execute(`
+        SELECT 
+          COUNT(*) as total,
+          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+          SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+          SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+        FROM reviews
+      `);
+
+      const stats = statsResult[0];
       
       res.render('admin/reviews', {
         title: 'Quản lý Đánh giá',
         user: req.session.user,
-        reviews
+        reviews,
+        stats,
+        currentPage,
+        totalPages,
+        totalReviews,
+        limit,
+        status,
+        type
       });
     } catch (error) {
       console.error('Error in getReviews:', error);
@@ -1807,9 +1865,79 @@ class AdminController {
   static async getEditOrder(req, res) { res.json({ message: 'Not implemented' }); }
   static async postEditOrder(req, res) { res.json({ message: 'Not implemented' }); }
   static async deleteOrder(req, res) { res.json({ message: 'Not implemented' }); }
-  static async approveReview(req, res) { res.json({ message: 'Not implemented' }); }
-  static async rejectReview(req, res) { res.json({ message: 'Not implemented' }); }
-  static async deleteReview(req, res) { res.json({ message: 'Not implemented' }); }
+  // Approve review
+  static async approveReview(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      
+      const [result] = await db.execute(`
+        UPDATE reviews 
+        SET status = 'approved', updated_at = NOW()
+        WHERE id = ?
+      `, [id]);
+
+      if (result.affectedRows > 0) {
+        res.json({ success: true, message: 'Duyệt đánh giá thành công!' });
+      } else {
+        res.json({ success: false, message: 'Không thể duyệt đánh giá!' });
+      }
+    } catch (error) {
+      console.error('Error in approveReview:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi duyệt đánh giá' });
+    }
+  }
+
+  // Reject review
+  static async rejectReview(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      
+      const [result] = await db.execute(`
+        UPDATE reviews 
+        SET status = 'rejected', updated_at = NOW()
+        WHERE id = ?
+      `, [id]);
+
+      if (result.affectedRows > 0) {
+        res.json({ success: true, message: 'Từ chối đánh giá thành công!' });
+      } else {
+        res.json({ success: false, message: 'Không thể từ chối đánh giá!' });
+      }
+    } catch (error) {
+      console.error('Error in rejectReview:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi từ chối đánh giá' });
+    }
+  }
+
+  // Delete review
+  static async deleteReview(req, res) {
+    try {
+      if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      
+      const [result] = await db.execute('DELETE FROM reviews WHERE id = ?', [id]);
+
+      if (result.affectedRows > 0) {
+        res.json({ success: true, message: 'Xóa đánh giá thành công!' });
+      } else {
+        res.json({ success: false, message: 'Không thể xóa đánh giá!' });
+      }
+    } catch (error) {
+      console.error('Error in deleteReview:', error);
+      res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi xóa đánh giá' });
+    }
+  }
   // Xem chi tiết khách hàng
   static async getViewCustomer(req, res) {
     try {

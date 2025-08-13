@@ -1,679 +1,375 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Đánh giá - LYN Salon</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<%- include('partials/header') %>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f6f8;
-            overflow-x: hidden;
-        }
+<div class="flex h-screen bg-gray-100">
+  <%- include('partials/sidebar') %>
+  
+  <div class="flex-1 overflow-auto">
+    <div class="p-6">
+      <!-- Header -->
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Quản lý Đánh giá</h1>
+        <p class="text-gray-600">Xem và quản lý đánh giá từ khách hàng</p>
+      </div>
 
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar */
-        .admin-sidebar {
-            width: 280px;
-            background: #2c3e50;
-            color: white;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1000;
-        }
-
-        .sidebar-profile {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid #34495e;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: #27ae60;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 2rem;
-            color: white;
-        }
-
-        .profile-name {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .profile-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #27ae60;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-        }
-
-        .sidebar-menu {
-            padding: 20px 0;
-        }
-
-        .menu-section {
-            margin-bottom: 20px;
-        }
-
-        .menu-title {
-            padding: 0 20px 10px;
-            color: #bdc3c7;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
-            color: #ecf0f1;
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-
-        .menu-item:hover {
-            background: #34495e;
-            border-left-color: #3498db;
-        }
-
-        .menu-item.active {
-            background: #34495e;
-            border-left-color: #3498db;
-            color: #3498db;
-        }
-
-        .menu-item-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .menu-item i {
-            width: 20px;
-            text-align: center;
-        }
-
-        .menu-item-arrow {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        /* Main Content */
-        .admin-main {
-            flex: 1;
-            margin-left: 280px;
-            background: #f4f6f8;
-        }
-
-        /* Top Navigation */
-        .admin-header {
-            background: #1e3a8a;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-title {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .hamburger-menu {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-link {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        .header-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .admin-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Content Area */
-        .admin-content {
-            padding: 30px;
-        }
-
-        .content-header {
-            margin-bottom: 30px;
-        }
-
-        .content-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .content-subtitle {
-            color: #7f8c8d;
-            font-size: 16px;
-        }
-
-        /* Action Bar */
-        .action-bar {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .filter-select {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            font-size: 14px;
-        }
-
-        /* Data Table */
-        .data-table {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .table-header {
-            background: #f8fafc;
-            padding: 20px 25px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .table-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th {
-            background: #f8fafc;
-            padding: 15px 20px;
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .table td {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f3f4f6;
-            vertical-align: middle;
-        }
-
-        .table tbody tr:hover {
-            background: #f9fafb;
-        }
-
-        .btn-action {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-right: 5px;
-        }
-
-        .btn-approve {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-reject {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-delete {
-            background: #dc2626;
-            color: white;
-        }
-
-        .rating {
-            display: flex;
-            gap: 2px;
-        }
-
-        .star {
-            color: #fbbf24;
-            font-size: 14px;
-        }
-
-        .star.empty {
-            color: #d1d5db;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-approved {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-rejected {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .review-content {
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* Footer */
-        .admin-footer {
-            background: white;
-            padding: 20px 30px;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .admin-sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-            }
-
-            .admin-sidebar.open {
-                transform: translateX(0);
-            }
-
-            .admin-main {
-                margin-left: 0;
-            }
-
-            .admin-content {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <div class="admin-sidebar">
-            <div class="sidebar-profile">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-name">Admin</div>
-                <div class="profile-status">
-                    <i class="fas fa-circle"></i>
-                    Online
-                </div>
+      <!-- Statistics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+              <i class="fas fa-star text-xl"></i>
             </div>
-
-            <div class="sidebar-menu">
-                <div class="menu-section">
-                    <div class="menu-title">MENU ADMIN</div>
-                    <a href="/admin" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-home"></i>
-                            <span>Trang chủ</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/appointments" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Lịch hẹn</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/services" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-cut"></i>
-                            <span>Dịch vụ</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/stylists" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-user-tie"></i>
-                            <span>Stylist</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/products" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-shopping-bag"></i>
-                            <span>Quản lý sản phẩm</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/orders" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Đơn hàng</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/reviews" class="menu-item active">
-                        <div class="menu-item-left">
-                            <i class="fas fa-star"></i>
-                            <span>Đánh giá</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/customers" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-users"></i>
-                            <span>Khách hàng</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/contact" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-envelope"></i>
-                            <span>Tin nhắn</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/employees" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-user-cog"></i>
-                            <span>Nhân viên</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                    <a href="/admin/settings" class="menu-item">
-                        <div class="menu-item-left">
-                            <i class="fas fa-cog"></i>
-                            <span>Cài đặt</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-item-arrow"></i>
-                    </a>
-                </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Tổng đánh giá</p>
+              <p class="text-2xl font-bold text-gray-900"><%= stats.total %></p>
             </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+              <i class="fas fa-clock text-xl"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Chờ duyệt</p>
+              <p class="text-2xl font-bold text-gray-900"><%= stats.pending %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100 text-green-600">
+              <i class="fas fa-check text-xl"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Đã duyệt</p>
+              <p class="text-2xl font-bold text-gray-900"><%= stats.approved %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-red-100 text-red-600">
+              <i class="fas fa-times text-xl"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Đã từ chối</p>
+              <p class="text-2xl font-bold text-gray-900"><%= stats.rejected %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+              <select id="statusFilter" class="w-full md:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Tất cả trạng thái</option>
+                <option value="pending">Chờ duyệt</option>
+                <option value="approved">Đã duyệt</option>
+                <option value="rejected">Đã từ chối</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Loại đánh giá</label>
+              <select id="typeFilter" class="w-full md:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Tất cả đánh giá</option>
+                <option value="service">Dịch vụ</option>
+                <option value="product">Sản phẩm</option>
+                <option value="stylist">Stylist</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex space-x-3">
+            <button id="clearFilters" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+              <i class="fas fa-times mr-2"></i>Xóa bộ lọc
+            </button>
+            <button id="refreshData" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              <i class="fas fa-sync-alt mr-2"></i>Làm mới
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Table -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">Danh sách đánh giá</h3>
         </div>
         
-        <!-- Main Content -->
-        <div class="admin-main">
-            <!-- Top Navigation -->
-            <div class="admin-header">
-                <div class="header-left">
-                    <button class="hamburger-menu" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="header-title">Quản lý Đánh giá</div>
-                </div>
-                <div class="header-right">
-                    <a href="/" class="header-link">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Khách hàng</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đánh giá</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nội dung</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dịch vụ/Sản phẩm</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày đánh giá</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% reviews.forEach(function(review) { %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    #<%= review.id %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-600"></i>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900"><%= review.customer_name %></div>
+                        <div class="text-sm text-gray-500"><%= review.customer_email %></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex text-yellow-400">
+                        <% for(let i = 1; i <= 5; i++) { %>
+                          <i class="fas fa-star <%= i <= review.rating ? 'text-yellow-400' : 'text-gray-300' %>"></i>
+                        <% } %>
+                      </div>
+                      <span class="ml-2 text-sm text-gray-600">(<%= review.rating %>/5)</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900 max-w-xs truncate" title="<%= review.comment %>">
+                      <%= review.comment %>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">
+                      <% if (review.service_name) { %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <i class="fas fa-cut mr-1"></i><%= review.service_name %>
+                        </span>
+                      <% } else if (review.product_name) { %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <i class="fas fa-box mr-1"></i><%= review.product_name %>
+                        </span>
+                      <% } else if (review.stylist_name) { %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          <i class="fas fa-user-tie mr-1"></i><%= review.stylist_name %>
+                        </span>
+                      <% } else { %>
+                        <span class="text-gray-500">-</span>
+                      <% } %>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= new Date(review.created_at).toLocaleDateString('vi-VN') %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                      <% if (review.status === 'pending') { %>bg-yellow-100 text-yellow-800<% } %>
+                      <% if (review.status === 'approved') { %>bg-green-100 text-green-800<% } %>
+                      <% if (review.status === 'rejected') { %>bg-red-100 text-red-800<% } %>">
+                      <% if (review.status === 'pending') { %>
+                        <i class="fas fa-clock mr-2"></i>Chờ duyệt
+                      <% } %>
+                      <% if (review.status === 'approved') { %>
+                        <i class="fas fa-check mr-2"></i>Đã duyệt
+                      <% } %>
+                      <% if (review.status === 'rejected') { %>
+                        <i class="fas fa-times mr-2"></i>Đã từ chối
+                      <% } %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                      <% if (review.status === 'pending') { %>
+                        <button onclick="approveReview(<%= review.id %>)" class="text-green-600 hover:text-green-900" title="Duyệt">
+                          <i class="fas fa-check"></i>
+                        </button>
+                        <button onclick="rejectReview(<%= review.id %>)" class="text-red-600 hover:text-red-900" title="Từ chối">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      <% } %>
+                      <button onclick="deleteReview(<%= review.id %>)" class="text-red-600 hover:text-red-900" title="Xóa">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                      <button onclick="viewReview(<%= review.id %>)" class="text-blue-600 hover:text-blue-900" title="Xem chi tiết">
                         <i class="fas fa-eye"></i>
-                        Xem website
-                    </a>
-                    <div class="admin-user">
-                        <i class="fas fa-user"></i>
-                        <span>Admin</span>
+                      </button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Content Area -->
-            <div class="admin-content">
-                <div class="content-header">
-                    <h1 class="content-title">Quản lý Đánh giá</h1>
-                    <p class="content-subtitle">Xem và quản lý đánh giá từ khách hàng</p>
-                </div>
-                
-                <!-- Action Bar -->
-                <div class="action-bar">
-                    <div class="filter-group">
-                        <select class="filter-select" onchange="filterReviews(this.value)">
-                            <option value="">Tất cả trạng thái</option>
-                            <option value="pending">Chờ duyệt</option>
-                            <option value="approved">Đã duyệt</option>
-                            <option value="rejected">Đã từ chối</option>
-                        </select>
-                        <select class="filter-select" onchange="filterByRating(this.value)">
-                            <option value="">Tất cả đánh giá</option>
-                            <option value="5">5 sao</option>
-                            <option value="4">4 sao</option>
-                            <option value="3">3 sao</option>
-                            <option value="2">2 sao</option>
-                            <option value="1">1 sao</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Data Table -->
-                <div class="data-table">
-                    <div class="table-header">
-                        <h3 class="table-title">Danh sách đánh giá</h3>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Khách hàng</th>
-                                <th>Đánh giá</th>
-                                <th>Nội dung</th>
-                                <th>Dịch vụ/Sản phẩm</th>
-                                <th>Ngày đánh giá</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% reviews.forEach(function(review) { %>
-                            <tr>
-                                <td><%= review.id %></td>
-                                <td><%= review.customer_name %></td>
-                                <td>
-                                    <div class="rating">
-                                        <% for(let i = 1; i <= 5; i++) { %>
-                                            <i class="fas fa-star star <%= i <= review.rating ? '' : 'empty' %>"></i>
-                                        <% } %>
-                                        <span style="margin-left: 5px; font-size: 12px; color: #6b7280;">
-                                            (<%= review.rating %>/5)
-                                        </span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="review-content" title="<%= review.content %>">
-                                        <%= review.content %>
-                                    </div>
-                                </td>
-                                <td><%= review.service_name || review.product_name || 'N/A' %></td>
-                                <td><%= new Date(review.created_at).toLocaleDateString('vi-VN') %></td>
-                                <td>
-                                    <span class="status-badge status-<%= review.status %>">
-                                        <% if (review.status === 'pending') { %>Chờ duyệt<% } %>
-                                        <% if (review.status === 'approved') { %>Đã duyệt<% } %>
-                                        <% if (review.status === 'rejected') { %>Đã từ chối<% } %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <% if (review.status === 'pending') { %>
-                                        <button class="btn-action btn-approve" onclick="approveReview(<%= review.id %>)">
-                                            <i class="fas fa-check"></i> Duyệt
-                                        </button>
-                                        <button class="btn-action btn-reject" onclick="rejectReview(<%= review.id %>)">
-                                            <i class="fas fa-times"></i> Từ chối
-                                        </button>
-                                    <% } %>
-                                    <button class="btn-action btn-delete" onclick="deleteReview(<%= review.id %>)">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </button>
-                                </td>
-                            </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="admin-footer">
-                <div>Copyright © 2014-2015 SÀI GÒN WEB</div>
-                <div>Version 1.0</div>
-            </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
         </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+          <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="flex-1 flex justify-between sm:hidden">
+                <% if (currentPage > 1) { %>
+                  <a href="?page=<%= currentPage - 1 %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Trước
+                  </a>
+                <% } %>
+                <% if (currentPage < totalPages) { %>
+                  <a href="?page=<%= currentPage + 1 %>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Sau
+                  </a>
+                <% } %>
+              </div>
+              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm text-gray-700">
+                    Hiển thị <span class="font-medium"><%= (currentPage - 1) * limit + 1 %></span> đến <span class="font-medium"><%= Math.min(currentPage * limit, totalReviews) %></span> trong tổng số <span class="font-medium"><%= totalReviews %></span> đánh giá
+                  </p>
+                </div>
+                <div>
+                  <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    <% if (currentPage > 1) { %>
+                      <a href="?page=<%= currentPage - 1 %>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <i class="fas fa-chevron-left"></i>
+                      </a>
+                    <% } %>
+                    
+                    <% for(let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                      <a href="?page=<%= i %>" class="relative inline-flex items-center px-4 py-2 border text-sm font-medium <%= i === currentPage ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50' %>">
+                        <%= i %>
+                      </a>
+                    <% } %>
+                    
+                    <% if (currentPage < totalPages) { %>
+                      <a href="?page=<%= currentPage + 1 %>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <i class="fas fa-chevron-right"></i>
+                      </a>
+                    <% } %>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script>
-        // Toggle sidebar on mobile
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.admin-sidebar');
-            sidebar.classList.toggle('open');
-        }
+<script>
+// Filter functionality
+document.getElementById('statusFilter').addEventListener('change', function() {
+  applyFilters();
+});
 
-        // Filter reviews by status
-        function filterReviews(status) {
-            // Implement filter functionality
-            console.log('Filter by status:', status);
-        }
+document.getElementById('typeFilter').addEventListener('change', function() {
+  applyFilters();
+});
 
-        // Filter reviews by rating
-        function filterByRating(rating) {
-            // Implement rating filter functionality
-            console.log('Filter by rating:', rating);
-        }
+document.getElementById('clearFilters').addEventListener('click', function() {
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('typeFilter').value = '';
+  applyFilters();
+});
 
-        // Approve review
-        function approveReview(id) {
-            if (confirm('Duyệt đánh giá này?')) {
-                fetch(`/admin/reviews/${id}/approve`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Có lỗi xảy ra!');
-                    }
-                });
-            }
-        }
+document.getElementById('refreshData').addEventListener('click', function() {
+  location.reload();
+});
 
-        // Reject review
-        function rejectReview(id) {
-            if (confirm('Từ chối đánh giá này?')) {
-                fetch(`/admin/reviews/${id}/reject`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Có lỗi xảy ra!');
-                    }
-                });
-            }
-        }
+function applyFilters() {
+  const status = document.getElementById('statusFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  
+  let url = '/admin/reviews?';
+  if (status) url += `status=${status}&`;
+  if (type) url += `type=${type}&`;
+  
+  window.location.href = url;
+}
 
-        // Delete review
-        function deleteReview(id) {
-            if (confirm('Xóa đánh giá này?')) {
-                fetch(`/admin/reviews/${id}/delete`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Có lỗi xảy ra!');
-                    }
-                });
-            }
-        }
-    </script>
-</body>
-</html> 
+// Review actions
+function approveReview(reviewId) {
+  if (confirm('Bạn có chắc chắn muốn duyệt đánh giá này?')) {
+    fetch(`/admin/reviews/${reviewId}/approve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Duyệt đánh giá thành công!');
+        location.reload();
+      } else {
+        alert('Có lỗi xảy ra: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Có lỗi xảy ra khi duyệt đánh giá');
+    });
+  }
+}
+
+function rejectReview(reviewId) {
+  if (confirm('Bạn có chắc chắn muốn từ chối đánh giá này?')) {
+    fetch(`/admin/reviews/${reviewId}/reject`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Từ chối đánh giá thành công!');
+        location.reload();
+      } else {
+        alert('Có lỗi xảy ra: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Có lỗi xảy ra khi từ chối đánh giá');
+    });
+  }
+}
+
+function deleteReview(reviewId) {
+  if (confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
+    fetch(`/admin/reviews/${reviewId}/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Xóa đánh giá thành công!');
+        location.reload();
+      } else {
+        alert('Có lỗi xảy ra: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Có lỗi xảy ra khi xóa đánh giá');
+    });
+  }
+}
+
+function viewReview(reviewId) {
+  // Implement view review detail functionality
+  alert('Chức năng xem chi tiết đánh giá sẽ được thêm sau');
+}
+</script>
+
+<%- include('partials/footer') %> 
